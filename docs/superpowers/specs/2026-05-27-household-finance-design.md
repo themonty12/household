@@ -227,6 +227,14 @@ Recommended modules:
 - Insights: rule-based comments now, AI-ready adapter boundary later.
 - UI: responsive app shell and feature screens.
 
+Target platform:
+
+- Vercel hosts the responsive web application and server-side route handlers.
+- Supabase provides authentication, Postgres storage, row-level security, and managed database migrations.
+- Supabase Auth is used for invite-only family access. Public registration remains disabled at the product level.
+- Supabase Row Level Security protects household finance records server-side in addition to application role checks.
+- Vercel environment variables store Supabase project URL, anon key, service role key for server-only admin operations, and app URL.
+
 Data flow:
 
 1. Users create transactions and update asset balances.
@@ -263,4 +271,4 @@ Responsive verification:
 
 The repository is currently empty except for Git metadata. Implementation can start from a modern full-stack web app scaffold. Favor a stack with server-rendered or API-backed authenticated routes, a relational database, and a responsive component system.
 
-The first implementation plan should create the app shell, auth boundary, database schema, transaction flow, monthly close calculation, and rule-based insights in that order.
+The first implementation plan should create a Next.js application suitable for Vercel, configure Supabase, define the database schema and RLS policies, build the app shell, implement the auth boundary, add transaction flow, monthly close calculation, and rule-based insights in that order.
