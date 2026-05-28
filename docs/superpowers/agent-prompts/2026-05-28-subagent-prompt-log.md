@@ -304,6 +304,95 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 33 - Task 6 Spec Review
+
+- Agent: `019e6d0e-70ab-7223-bcab-e7dc63f6b21e` / Averroes
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 6 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 6 required:
+- src/app/actions/auth.ts with "use server", signIn(formData), signOut(), Supabase server client usage, invalid redirect /login?error=invalid, success redirect /today, logout redirect /login.
+- src/app/(auth)/login/page.tsx with heading Sign in, invite-only copy, invalid error message, email/password fields, submit button, form action signIn, responsive centered panel.
+- tests/e2e/app-shell.spec.ts unskipped so it checks /login heading Sign in on desktop/mobile now that route exists.
+
+Implementation commit: 5e979e1 feat: add invite-only login screen.
+Cleanup commit: c04f9d4 ignored Playwright test-results and updated prompt log.
+
+Verify actual code against the task. Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 34 - Task 6 Code Quality Review
+
+- Agent: `019e6d0f-ec06-7033-8947-d541478eedad` / Hume
+- Type: code quality reviewer
+- Result: requested fix for typed-route `/today` build blocker
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 6 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 6 added login/logout server actions, login page, and unskipped the /login e2e smoke test. Spec compliance already passed.
+
+Review current code and commit range f7e6ffa..c04f9d4. Focus on:
+- Server action correctness and redirect behavior.
+- Security of login error handling and no user-controlled redirects.
+- Next.js App Router compatibility, especially searchParams typing for Next 15.
+- Whether login page is accessible and responsive.
+- Whether e2e unskip is appropriate and runnable once Playwright browser exists.
+- Whether ignoring test-results is correct.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 35 - Task 6 Fix Request: Typed Route Placeholder
+
+- Agent: `019e6d0a-961f-72c3-9509-914a289556c2` / Russell
+- Type: follow-up implementation instruction
+- Result: completed in `fix: add temporary today route`
+
+Message content:
+
+```text
+Please fix the Task 6 build-blocking code quality issue only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/app/(app)/today/page.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 35 result if you commit successfully
+
+Issue:
+- With typed routes enabled, auth success redirects to /today, but no /today route exists yet. Build fails.
+
+Required fix:
+- Add a minimal placeholder `src/app/(app)/today/page.tsx` route so typedRoutes accepts `/today`.
+- Keep it intentionally small because Task 7 will replace it with the real Today screen.
+- It should render a simple heading like `Today` and a short neutral line saying setup continues. Do not implement transaction UI here.
+
+Verification:
+- Run type check if practical.
+- Run build if practical.
+- Run unit tests if practical.
+- Run git diff --check.
+
+Commit with:
+- git add "src/app/(app)/today/page.tsx" docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: add temporary today route"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 25 - Task 5 Implementer
 
 - Agent: `019e6c20-4b75-7531-8897-88e2fc5760f1` / Confucius
