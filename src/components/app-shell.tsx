@@ -15,9 +15,9 @@ type NavItem = {
 
 const navigation: NavItem[] = [
   { label: "Today", href: "/today", icon: Home },
-  { label: "Close", href: "/monthly-close" as Route, icon: BarChart3 },
-  { label: "Assets", href: "/assets" as Route, icon: Landmark },
-  { label: "Settings", href: "/settings" as Route, icon: Settings }
+  { label: "Close", href: "/monthly-close", icon: BarChart3 },
+  { label: "Assets", href: "/assets", icon: Landmark },
+  { label: "Settings", href: "/settings", icon: Settings }
 ];
 
 type AppShellProps = {

@@ -304,11 +304,122 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
-## Prompt 36 - Task 6 Fix Request: AppShell Typed Routes
+## Prompt 37 - Task 6 Spec Re-Review
+
+- Agent: `019e6d24-a399-7da1-b7fd-740f64f3273c` / Hilbert
+- Type: spec compliance re-reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are re-reviewing Task 6 spec compliance after fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 6 spec previously passed. Fix commits after review:
+- 5951d56 added a minimal temporary /today route so login success redirect is a valid typed route.
+- 3487c0e typed AppShell nav routes to satisfy Next typedRoutes.
+
+Verify Task 6 still satisfies:
+- auth actions signIn/signOut behavior and redirects.
+- login page content/form/error behavior.
+- e2e smoke is unskipped and checks /login Sign in.
+- temporary /today route is minimal and does not implement Task 7 transaction UI.
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 38 - Task 6 Code Quality Re-Review
+
+- Agent: `019e6d2a-b3df-7870-b304-027c0177c0fe` / Plato
+- Type: code quality re-reviewer
+- Result: requested fixes for Playwright port collision, missing nav route placeholders, and typedRoutes config
+
+Message content:
+
+```text
+You are re-reviewing Task 6 code quality after fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous quality review found:
+- Critical: login success redirect to /today failed typedRoutes because /today did not exist.
+
+Fixes:
+- 5951d56 added a minimal temporary /today route.
+- 3487c0e typed AppShell nav routes.
+
+Spec re-review passed. Review current code for remaining quality/build blockers. Focus on:
+- Whether /today placeholder is acceptable until Task 7.
+- Whether AppShell Route typing is idiomatic and avoids unsafe casts where possible.
+- Whether login action/page quality remains sound.
+- Whether Playwright config/test behavior is okay despite a prior environment collision with port 3000.
+- Whether build now passes with required env vars.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 39 - Task 6 Fix Request: Route Placeholders And E2E Port
 
 - Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
 - Type: follow-up implementation instruction
 - Result: implemented and committed
+
+Message content:
+
+```text
+Please fix the remaining Task 6 code quality issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/app/(app)/monthly-close/page.tsx
+- src/app/(app)/assets/page.tsx
+- src/app/(app)/settings/page.tsx
+- src/components/app-shell.tsx
+- playwright.config.ts
+- next.config.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 39 result if you commit successfully
+
+Issues:
+1. AppShell exposes /monthly-close, /assets, /settings links but those routes do not exist yet, so unsafe `as Route` casts hide broken links.
+2. Playwright reuses whatever is already on port 3000, causing false failures.
+3. next.config.ts uses deprecated experimental.typedRoutes instead of top-level typedRoutes.
+
+Required fixes:
+1. Add minimal placeholder pages for /monthly-close, /assets, and /settings.
+   - Keep them intentionally small; Task 8/9 will replace with real screens.
+   - Headings: Monthly Close, Assets, Settings.
+   - Short neutral line that setup continues.
+2. Remove unsafe `as Route` casts from AppShell navigation now that routes exist.
+3. Change next.config.ts to top-level `typedRoutes: true`.
+4. Update Playwright config to use an isolated port that is unlikely to collide, e.g. 3100:
+   - baseURL http://127.0.0.1:3100
+   - webServer command should run Next on port 3100 and provide the public Supabase env vars needed for login page build/dev.
+   - webServer url http://127.0.0.1:3100
+   - Prefer `reuseExistingServer: false` or CI-safe behavior that avoids using unrelated apps.
+
+Verification:
+- Run type check if practical.
+- Run unit tests if practical.
+- Run build with required env vars if practical.
+- Run e2e smoke if practical.
+- Run git diff --check.
+
+Commit with:
+- git add "src/app/(app)/monthly-close/page.tsx" "src/app/(app)/assets/page.tsx" "src/app/(app)/settings/page.tsx" src/components/app-shell.tsx playwright.config.ts next.config.ts docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: stabilize shell routes and e2e port"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 36 - Task 6 Fix Request: AppShell Typed Routes
+
+- Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
+- Type: follow-up implementation instruction
+- Result: completed in `3487c0e fix: type app shell routes`
 
 Message content:
 
