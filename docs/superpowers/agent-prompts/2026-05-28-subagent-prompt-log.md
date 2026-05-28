@@ -305,3 +305,31 @@ Commit with:
 
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
+
+## Prompt 14 - Task 2 Final Code Quality Re-Review
+
+- Agent: `019e6bfc-658b-7d61-ade0-5f846a12f3c7` / Zeno
+- Type: code quality re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are doing the final Task 2 database migration code quality re-review.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous quality reviews found:
+1. Cross-household FK integrity missing.
+2. Transaction constraints too loose.
+3. Month columns lacked first-of-month checks.
+4. Adjustment category behavior did not match the planned validation/action behavior.
+
+Fix commits:
+- 5e30219 fix: enforce household-local finance constraints
+- 6fa0219 fix: align adjustment transaction constraint
+
+Review the current migration and relevant ranges. Verify all previous issues are resolved without creating SQL problems. Focus on composite FK syntax/null behavior, transaction_type_requirements semantics, first-of-month checks, indexes/constraints, and Supabase/Postgres plausibility.
+
+Use standard review output and Ready to merge verdict.
+```
