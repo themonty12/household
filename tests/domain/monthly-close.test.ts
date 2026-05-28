@@ -68,4 +68,33 @@ describe("calculateMonthlyClose", () => {
     expect(metrics.netWorthChange).toBe(1200);
     expect(metrics.categoryTotals.food).toBe(1200);
   });
+
+  it("subtracts budgeted categories with zero actual spend from budget variance", () => {
+    const metrics = calculateMonthlyClose({
+      month: "2026-05",
+      transactions: [],
+      budgets: [{ categoryId: "food", amount: 400 }]
+    });
+
+    expect(metrics.budgetVariance).toBe(-400);
+  });
+
+  it("adds unbudgeted expense categories to budget variance", () => {
+    const metrics = calculateMonthlyClose({
+      month: "2026-05",
+      transactions: [
+        {
+          id: "expense-1",
+          date: "2026-05-12",
+          type: "expense",
+          amount: 250,
+          categoryId: "medical",
+          accountId: "checking"
+        }
+      ],
+      budgets: []
+    });
+
+    expect(metrics.budgetVariance).toBe(250);
+  });
 });

@@ -279,6 +279,105 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 20 - Task 4 Spec Review
+
+- Agent: `019e6c16-31a8-7632-8d2d-7e59de306428` / Franklin
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 4 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 4 required:
+- src/lib/domain/types.ts with TransactionType, TransactionInput, BudgetInput, SnapshotInput, InsightSeverity, InsightItem, MonthlyCloseMetrics.
+- src/lib/domain/monthly-close.ts with pure calculateMonthlyClose and behavior exactly described in Prompt 19.
+- src/lib/domain/insights.ts with pure generateInsights and rules exactly described in Prompt 19.
+- src/lib/domain/format.ts with formatWon and formatPercent.
+- tests/domain/monthly-close.test.ts and tests/domain/insights.test.ts covering the specific examples from Prompt 19.
+
+Implementer commit: f7e6b95 feat: add monthly close domain logic.
+
+Verify actual code and tests. Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 21 - Task 4 Code Quality Review
+
+- Agent: `019e6c17-920c-7352-8647-bac51ed57569` / Nash
+- Type: code quality reviewer
+- Result: requested fixes for budget variance and partial-budget insight semantics
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 4 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 4 added pure domain calculation/format modules and tests in commit f7e6b95. Spec compliance already passed.
+
+Review current code and range a744dcb..f7e6b95. Focus on:
+- Correctness and edge cases in monthly-close calculations.
+- Budget variance semantics and whether missing budget categories behave sensibly.
+- Ratio rounding and divide-by-zero behavior.
+- Insight rule clarity, duplicate titles, and metric references.
+- Test quality and whether tests verify behavior rather than implementation details.
+- Module responsibility and future reuse by UI/server actions.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 22 - Task 4 Fix Request: Budget Variance Semantics
+
+- Agent: `019e6c10-8987-7cc0-9e50-267092f88b88` / Archimedes
+- Type: follow-up implementation instruction
+- Result: completed
+
+Message content:
+
+```text
+Please fix Task 4 code quality review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/lib/domain/types.ts, only if needed for the fix
+- src/lib/domain/monthly-close.ts
+- src/lib/domain/insights.ts
+- tests/domain/monthly-close.test.ts
+- tests/domain/insights.test.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 22 result if you commit successfully
+
+Required fixes:
+1. Define and implement budgetVariance as actual minus planned across the union of budgeted categories and categories with actual expenses.
+   - A budgeted category with zero actual spend contributes `0 - budget`.
+   - An unbudgeted category with actual spend contributes `actual - 0`.
+   - Keep the existing happy-path example at budgetVariance 100.
+2. Make insights consistent with that variance:
+   - Keep Budget overrun for categories with a defined budget where actual > budget.
+   - Add an info or warning insight for unbudgeted spending categories with actual > 0, so variance caused by unbudgeted spending is explained.
+3. Give missing setup insights distinct titles, e.g. `Budgets missing` and `Snapshot missing`, rather than duplicate `More setup needed`.
+4. Add focused tests for:
+   - budgeted category with zero spend reduces budgetVariance.
+   - unbudgeted expense increases budgetVariance and generates an unbudgeted-spending insight.
+   - missing budget/snapshot insights are distinct and have correct metricRefs.
+
+Verification:
+- Run Task 4 tests.
+- Run type check if practical.
+- Run git diff --check.
+
+Commit with:
+- git add src/lib/domain tests/domain docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: clarify budget variance insights"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 17 - Task 3 Spec Review
 
 - Agent: `019e6c09-318d-7153-bf2d-4170293a7f6a` / Gauss
@@ -334,6 +433,70 @@ Spec compliance already passed. Review current code and relevant commit range 91
 
 Use standard review output:
 Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 19 - Task 4 Implementer
+
+- Agent: `019e6c10-8987-7cc0-9e50-267092f88b88` / Archimedes
+- Type: implementer
+- Result: completed in `f7e6b95 feat: add monthly close domain logic`
+
+Message content:
+
+```text
+You are implementing Task 4: Implement Pure Domain Calculations with Tests.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/lib/domain/types.ts
+- src/lib/domain/monthly-close.ts
+- src/lib/domain/insights.ts
+- src/lib/domain/format.ts
+- tests/domain/monthly-close.test.ts
+- tests/domain/insights.test.ts
+
+Task requirements:
+1. Create shared domain types:
+   - TransactionType = income | expense | transfer | adjustment
+   - TransactionInput with id/date/type/amount/categoryId/accountId/toAccountId
+   - BudgetInput with categoryId/amount
+   - SnapshotInput with month/totalAssets/totalLiabilities/netWorth
+   - InsightSeverity = info | positive | warning
+   - InsightItem with severity/title/message/metricRefs/suggestedAction
+   - MonthlyCloseMetrics with month, incomeTotal, expenseTotal, transferTotal, budgetVariance, savingsRate, fixedCostRatio, netWorthChange, categoryTotals, budgetByCategory, missingBudget, missingSnapshot
+2. Implement calculateMonthlyClose(input) as a pure function:
+   - totals income, expenses, transfers
+   - builds categoryTotals for expense categories
+   - maps budgets by category
+   - budgetVariance is sum(actual - budget) for categoryTotals
+   - savingsRate = round to 4 decimals of (income - expense) / income, or null
+   - fixedCostRatio = fixed category expenses / income, or null
+   - netWorthChange = snapshot.netWorth - previousSnapshot.netWorth when both exist, else null
+   - missingBudget true when no budgets
+   - missingSnapshot true when no snapshot
+3. Implement generateInsights(metrics) as a pure function:
+   - warning Budget overrun for categories whose actual spending exceeds budget
+   - positive Strong savings rate when savingsRate >= 0.3
+   - warning Fixed costs are high when fixedCostRatio >= 0.5
+   - positive Net worth increased when netWorthChange > 0
+   - info More setup needed for missingBudget
+   - info More setup needed for missingSnapshot
+4. Implement formatWon(value) and formatPercent(value | null).
+5. Add Vitest tests equivalent to the plan:
+   - monthly close aggregates income 5000, expenses 2000, transfer 1000, budgetVariance 100, savingsRate 0.6, netWorthChange 1200, food category total 1200.
+   - insights include Budget overrun, Strong savings rate, Net worth increased for those metrics.
+   - insights emit two More setup needed items when budget and snapshot are missing.
+
+Verification:
+- Run tests for Task 4. If npm is unavailable on PATH, use the local node binary and node_modules vitest binary, or report the exact blocker.
+- Run a type check if practical.
+
+Commit with:
+- git add src/lib/domain tests/domain
+- git commit -m "feat: add monthly close domain logic"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
 ## Prompt 10 - Task 2 Fix Request: Household-Local Constraints

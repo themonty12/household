@@ -53,9 +53,14 @@ export function calculateMonthlyClose(
     0
   );
 
-  const budgetVariance = Object.entries(categoryTotals).reduce(
-    (total, [categoryId, actual]) =>
-      total + (actual - (budgetByCategory[categoryId] ?? 0)),
+  const varianceCategoryIds = new Set([
+    ...Object.keys(budgetByCategory),
+    ...Object.keys(categoryTotals)
+  ]);
+  const budgetVariance = Array.from(varianceCategoryIds).reduce(
+    (total, categoryId) =>
+      total +
+      ((categoryTotals[categoryId] ?? 0) - (budgetByCategory[categoryId] ?? 0)),
     0
   );
 

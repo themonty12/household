@@ -15,6 +15,19 @@ export function generateInsights(metrics: MonthlyCloseMetrics): InsightItem[] {
         suggestedAction: "Review recent spending and adjust the category plan."
       });
     }
+
+    if (budget === undefined && actual > 0) {
+      insights.push({
+        severity: "info",
+        title: "Unbudgeted spending",
+        message: `${categoryId} spending has no budget for this month.`,
+        metricRefs: [
+          `categoryTotals.${categoryId}`,
+          `budgetByCategory.${categoryId}`
+        ],
+        suggestedAction: "Add a budget or recategorize the transaction."
+      });
+    }
   }
 
   if (metrics.savingsRate !== null && metrics.savingsRate >= 0.3) {
@@ -50,7 +63,7 @@ export function generateInsights(metrics: MonthlyCloseMetrics): InsightItem[] {
   if (metrics.missingBudget) {
     insights.push({
       severity: "info",
-      title: "More setup needed",
+      title: "Budgets missing",
       message: "Add budgets to compare planned and actual spending.",
       metricRefs: ["missingBudget"],
       suggestedAction: "Create category budgets for the month."
@@ -60,7 +73,7 @@ export function generateInsights(metrics: MonthlyCloseMetrics): InsightItem[] {
   if (metrics.missingSnapshot) {
     insights.push({
       severity: "info",
-      title: "More setup needed",
+      title: "Snapshot missing",
       message: "Add a monthly snapshot to calculate net worth movement.",
       metricRefs: ["missingSnapshot"],
       suggestedAction: "Record assets, liabilities, and net worth."

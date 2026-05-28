@@ -47,8 +47,43 @@ describe("generateInsights", () => {
 
     const insights = generateInsights(metrics);
 
-    expect(
-      insights.filter((insight) => insight.title === "More setup needed")
-    ).toHaveLength(2);
+    expect(insights).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "Budgets missing",
+          metricRefs: ["missingBudget"]
+        }),
+        expect.objectContaining({
+          title: "Snapshot missing",
+          metricRefs: ["missingSnapshot"]
+        })
+      ])
+    );
+  });
+
+  it("explains unbudgeted expense categories", () => {
+    const insights = generateInsights({
+      month: "2026-05",
+      incomeTotal: 0,
+      expenseTotal: 250,
+      transferTotal: 0,
+      budgetVariance: 250,
+      savingsRate: null,
+      fixedCostRatio: null,
+      netWorthChange: null,
+      categoryTotals: { medical: 250 },
+      budgetByCategory: {},
+      missingBudget: false,
+      missingSnapshot: false
+    });
+
+    expect(insights).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "Unbudgeted spending",
+          metricRefs: ["categoryTotals.medical", "budgetByCategory.medical"]
+        })
+      ])
+    );
   });
 });
