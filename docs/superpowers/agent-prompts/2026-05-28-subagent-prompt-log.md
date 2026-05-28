@@ -304,6 +304,43 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 36 - Task 6 Fix Request: AppShell Typed Routes
+
+- Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
+- Type: follow-up implementation instruction
+- Result: implemented and committed
+
+Message content:
+
+```text
+Please fix the remaining typed-routes build issue only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/components/app-shell.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 36 result if you commit successfully
+
+Issue:
+- npm exec tsc / npm run build now fail at src/components/app-shell.tsx:59 because nav item hrefs are inferred as plain string and passed to Next Link under typedRoutes.
+
+Required fix:
+- Type the nav item hrefs as valid Next routes. Use a clean local type, e.g. import type { Route } from "next" and type nav items with `href: Route`, or another idiomatic typedRoutes-safe approach.
+- Keep the same nav labels, routes, and icons.
+
+Verification:
+- Run type check if practical.
+- Run build if practical.
+- Run unit tests if practical.
+- Run git diff --check.
+
+Commit with:
+- git add src/components/app-shell.tsx docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: type app shell routes"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 33 - Task 6 Spec Review
 
 - Agent: `019e6d0e-70ab-7223-bcab-e7dc63f6b21e` / Averroes
@@ -359,7 +396,7 @@ Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with 
 
 - Agent: `019e6d0a-961f-72c3-9509-914a289556c2` / Russell
 - Type: follow-up implementation instruction
-- Result: completed in `fix: add temporary today route`
+- Result: completed in `5951d56 fix: add temporary today route`; revealed AppShell typed-route issue
 
 Message content:
 

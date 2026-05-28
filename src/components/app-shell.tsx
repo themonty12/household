@@ -1,15 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { BarChart3, Home, Landmark, Settings } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import clsx from "clsx";
 
-const navigation = [
+type NavItem = {
+  label: string;
+  href: Route;
+  icon: LucideIcon;
+};
+
+const navigation: NavItem[] = [
   { label: "Today", href: "/today", icon: Home },
-  { label: "Close", href: "/monthly-close", icon: BarChart3 },
-  { label: "Assets", href: "/assets", icon: Landmark },
-  { label: "Settings", href: "/settings", icon: Settings }
+  { label: "Close", href: "/monthly-close" as Route, icon: BarChart3 },
+  { label: "Assets", href: "/assets" as Route, icon: Landmark },
+  { label: "Settings", href: "/settings" as Route, icon: Settings }
 ];
 
 type AppShellProps = {
@@ -46,8 +54,6 @@ export function AppShell({ children }: AppShellProps) {
     </div>
   );
 }
-
-type NavItem = (typeof navigation)[number];
 
 function NavLink({ item, mobile = false }: { item: NavItem; mobile?: boolean }) {
   const pathname = usePathname();
