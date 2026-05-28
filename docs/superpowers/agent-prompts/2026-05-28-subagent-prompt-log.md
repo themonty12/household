@@ -260,6 +260,36 @@ Use standard review output:
 Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
 ```
 
+## Prompt 43 - Task 6 Final Code Quality Re-Review Retry
+
+- Agent: `019e7100-79b6-7c21-9323-4d9af9d080e2` / Socrates
+- Type: code quality re-reviewer
+- Result: package-lock blocker resolved; requested prompt-log dirty state commit
+
+Message content:
+
+```text
+You are doing the final Task 6 code quality re-review after resolving the package-lock dirty-state issue.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous final quality review found only one blocker:
+- next build passed but mutated package-lock.json with Next SWC optional dependency entries.
+
+Fix:
+- 4bf0758 committed the generated Next SWC optional dependency lockfile entries.
+
+Verify no remaining blockers or dirty-state issues. Check:
+- git status clean except ignored build artifacts.
+- build passes with required env vars.
+- e2e login smoke passes on isolated port 3100.
+- no package-lock churn after verification.
+- login/page/action quality remains sound.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
 ## Prompt 32 - Task 6 Implementer
 
 - Agent: `019e6d0a-961f-72c3-9509-914a289556c2` / Russell
