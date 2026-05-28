@@ -317,6 +317,65 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 30 - Task 5 Spec Re-Review
+
+- Agent: `019e6d05-0b2d-7090-9e97-6374540f8b15` / Euler
+- Type: spec compliance re-reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are re-reviewing Task 5 spec compliance after cleanup commit ebdbbbd.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Original Task 5 spec passed. Cleanup commit:
+- marked the /login e2e smoke test skipped until Task 6 creates /login
+- added mobile safe-area padding
+- changed SummaryCard section to div
+
+Verify Task 5 requirements still hold:
+- required layout/page/shell/card files exist and match behavior
+- e2e smoke test file still exists and clearly targets /login Sign in for Task 6 to unskip
+- no /login or real /today page was added in Task 5
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 31 - Task 5 Code Quality Re-Review
+
+- Agent: `019e6d08-2874-7083-9182-df609b1a7650` / Raman
+- Type: code quality re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are re-reviewing Task 5 code quality after cleanup commit ebdbbbd.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous quality review found:
+- e2e smoke test would fail before Task 6 because /login does not exist.
+- root redirects point to /login and /today, which are planned for Task 6 and Task 7.
+- mobile nav lacked safe-area padding.
+- SummaryCard used unnamed section.
+- env parsing concern belongs to Task 3 follow-up if needed.
+
+Fixes:
+- e2e test is skipped until Task 6, but kept for Task 6 to unskip.
+- mobile safe-area padding added.
+- SummaryCard changed to div.
+
+Scope boundary:
+- Do not treat missing /login or real /today as a Task 5 blocker now; Task 6 and Task 7 own those pages.
+- Focus on whether Task 5 shell code is clean and whether skipped e2e is an acceptable temporary state.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
 ## Prompt 27 - Task 5 Spec Review
 
 - Agent: `019e6cfe-0a0d-76d3-a954-ba73f46b0d37` / Parfit
@@ -375,7 +434,7 @@ Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with 
 
 - Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
 - Type: follow-up implementation instruction
-- Result: implemented and committed
+- Result: completed in `ebdbbbd fix: tidy pre-login shell checks`
 
 Message content:
 
