@@ -260,6 +260,75 @@ Use standard review output:
 Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
 ```
 
+## Prompt 44 - Task 7 Implementer
+
+- Agent: Codex
+- Type: implementer
+- Result: implemented and committed
+
+Message content:
+
+```text
+You are implementing Task 7: Add Transaction Validation and Today Screen.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/lib/validation/transaction.ts
+- tests/validation/transaction.test.ts
+- src/components/forms/transaction-form.tsx
+- src/app/actions/transactions.ts
+- src/lib/repositories/finance.ts
+- src/app/(app)/today/page.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 44 result if you commit successfully
+
+Task requirements:
+1. Add transactionSchema with Zod:
+   - date YYYY-MM-DD
+   - type income | expense | transfer | adjustment
+   - amount coerced positive number
+   - accountId required
+   - toAccountId optional
+   - categoryId optional
+   - memo max 240 default ""
+   - transfer requires toAccountId
+   - non-transfer requires categoryId, matching the tightened DB constraint for income/expense/adjustment
+2. Add tests:
+   - accepts positive expense and coerces amount to number
+   - rejects transfer without destination account
+   - add a focused test that adjustment without category is rejected, because DB now requires non-transfer category
+3. Add getTodayData(supabase, householdId) repository:
+   - fetch active accounts, active categories, recent posted transactions
+   - throw on Supabase errors
+4. Add createTransaction(formData) server action:
+   - requireUser()
+   - parse formData with transactionSchema
+   - insert into transactions with household_id, date, type, amount, account_id, to_account_id for transfers, category_id for non-transfers, user_id, memo
+   - revalidate /today and /monthly-close
+5. Add TransactionForm:
+   - amount/date/type/account/category/memo fields
+   - action createTransaction
+   - responsive, compact, no nested cards
+6. Replace temporary src/app/(app)/today/page.tsx with real Today screen:
+   - requireUser()
+   - getTodayData()
+   - summary cards for recent expenses, active accounts, categories
+   - TransactionForm
+   - recent transactions list
+
+Verification:
+- Run validation/domain tests.
+- Run type check.
+- Run build with required env vars if practical.
+- Run git diff --check.
+
+Commit with:
+- git add src/lib/validation tests/validation src/components/forms src/app/actions/transactions.ts src/lib/repositories/finance.ts "src/app/(app)/today/page.tsx" docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "feat: add transaction entry"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 43 - Task 6 Final Code Quality Re-Review Retry
 
 - Agent: `019e7100-79b6-7c21-9323-4d9af9d080e2` / Socrates
