@@ -21,7 +21,8 @@ create table profiles (
   display_name text not null,
   role app_role not null default 'member',
   status membership_status not null default 'active',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (household_id, id)
 );
 
 create table accounts (
@@ -33,7 +34,10 @@ create table accounts (
   include_in_net_worth boolean not null default true,
   current_balance numeric(14, 2) not null default 0,
   status record_status not null default 'active',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (household_id, id),
+  constraint accounts_household_owner_user_fk
+    foreign key (household_id, owner_user_id) references profiles(household_id, id)
 );
 
 create table categories (
@@ -44,7 +48,10 @@ create table categories (
   parent_category_id uuid references categories(id) on delete set null,
   sort_order integer not null default 0,
   status record_status not null default 'active',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (household_id, id),
+  constraint categories_household_parent_category_fk
+    foreign key (household_id, parent_category_id) references categories(household_id, id)
 );
 
 create table transactions (
@@ -61,27 +68,40 @@ create table transactions (
   status transaction_status not null default 'posted',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  constraint transfer_requires_destination check (
-    (type = 'transfer' and to_account_id is not null) or
-    (type <> 'transfer' and to_account_id is null)
+  constraint transactions_household_account_fk
+    foreign key (household_id, account_id) references accounts(household_id, id),
+  constraint transactions_household_to_account_fk
+    foreign key (household_id, to_account_id) references accounts(household_id, id),
+  constraint transactions_household_category_fk
+    foreign key (household_id, category_id) references categories(household_id, id),
+  constraint transactions_household_user_fk
+    foreign key (household_id, user_id) references profiles(household_id, id),
+  constraint transaction_type_requirements check (
+    (type = 'transfer' and to_account_id is not null and category_id is null and account_id <> to_account_id) or
+    (type in ('income', 'expense') and to_account_id is null and category_id is not null) or
+    (type = 'adjustment' and to_account_id is null)
   )
 );
 
 create table budgets (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references households(id) on delete cascade,
-  month date not null,
+  month date not null check (month = date_trunc('month', month)::date),
   category_id uuid not null references categories(id),
   amount numeric(14, 2) not null check (amount >= 0),
   created_by_user_id uuid not null references profiles(id),
   created_at timestamptz not null default now(),
+  constraint budgets_household_category_fk
+    foreign key (household_id, category_id) references categories(household_id, id),
+  constraint budgets_household_created_by_user_fk
+    foreign key (household_id, created_by_user_id) references profiles(household_id, id),
   unique (household_id, month, category_id)
 );
 
 create table monthly_snapshots (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references households(id) on delete cascade,
-  month date not null,
+  month date not null check (month = date_trunc('month', month)::date),
   total_assets numeric(14, 2) not null,
   total_liabilities numeric(14, 2) not null,
   net_worth numeric(14, 2) not null,
@@ -93,7 +113,7 @@ create table monthly_snapshots (
 create table monthly_closes (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references households(id) on delete cascade,
-  month date not null,
+  month date not null check (month = date_trunc('month', month)::date),
   income_total numeric(14, 2) not null,
   expense_total numeric(14, 2) not null,
   transfer_total numeric(14, 2) not null,
@@ -107,9 +127,17 @@ create table monthly_closes (
 );
 
 create index accounts_household_idx on accounts(household_id);
+create index accounts_household_owner_user_idx on accounts(household_id, owner_user_id);
 create index categories_household_idx on categories(household_id);
+create index categories_household_parent_category_idx on categories(household_id, parent_category_id);
 create index transactions_household_date_idx on transactions(household_id, date);
+create index transactions_household_account_idx on transactions(household_id, account_id);
+create index transactions_household_to_account_idx on transactions(household_id, to_account_id);
+create index transactions_household_category_idx on transactions(household_id, category_id);
+create index transactions_household_user_idx on transactions(household_id, user_id);
 create index budgets_household_month_idx on budgets(household_id, month);
+create index budgets_household_category_idx on budgets(household_id, category_id);
+create index budgets_household_created_by_user_idx on budgets(household_id, created_by_user_id);
 create index monthly_snapshots_household_month_idx on monthly_snapshots(household_id, month);
 
 create or replace function current_household_id()
