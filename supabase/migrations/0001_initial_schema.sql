@@ -78,8 +78,7 @@ create table transactions (
     foreign key (household_id, user_id) references profiles(household_id, id),
   constraint transaction_type_requirements check (
     (type = 'transfer' and to_account_id is not null and category_id is null and account_id <> to_account_id) or
-    (type in ('income', 'expense') and to_account_id is null and category_id is not null) or
-    (type = 'adjustment' and to_account_id is null)
+    (type in ('income', 'expense', 'adjustment') and to_account_id is null and category_id is not null)
   )
 );
 

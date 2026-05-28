@@ -273,3 +273,35 @@ Review current migration and git range 9481218..5e30219. Verify those issues are
 
 Use standard review output and Ready to merge verdict.
 ```
+
+## Prompt 13 - Task 2 Fix Request: Adjustment Category Alignment
+
+- Agent: `019e6bec-a03b-7130-9c61-3934a5fb4ff2` / Lorentz
+- Type: follow-up implementation instruction
+- Result: completed
+
+Message content:
+
+```text
+Please fix the remaining Task 2 code quality issue only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- supabase/migrations/0001_initial_schema.sql
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 13 result if you commit successfully
+
+Required fix:
+- Align the database transaction type constraint with the planned validation/action behavior: every non-transfer transaction, including adjustment, must have category_id and must not have to_account_id.
+- Transfers must still have to_account_id, must not have category_id, and account_id must differ from to_account_id.
+
+Verification:
+- Run git diff --check.
+- Do a static check that transaction_type_requirements contains category_id is not null for adjustment/non-transfer behavior.
+
+Commit with:
+- git add supabase/migrations/0001_initial_schema.sql docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: align adjustment transaction constraint"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
