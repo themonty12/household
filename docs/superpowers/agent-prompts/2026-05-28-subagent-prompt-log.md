@@ -210,6 +210,113 @@ Review commit range 5884868..9481218. Spec compliance already passed. Focus on S
 Use standard review output and Ready to merge verdict.
 ```
 
+## Prompt 15 - Task 3 Implementer
+
+- Agent: `019e6bff-3fdf-7631-aa51-a19765c3c7f5` / Bohr
+- Type: implementer
+- Result: completed in `615c9bc feat: add supabase clients`
+
+Message content:
+
+```text
+You are implementing Task 3: Add Environment and Supabase Clients.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/lib/env.ts
+- src/lib/supabase/browser.ts
+- src/lib/supabase/server.ts
+- src/lib/auth/require-user.ts
+
+Task source: Task 3 from docs/superpowers/plans/2026-05-27-household-finance-mvp.md.
+
+Implement environment validation with Zod, browser/server Supabase clients using @supabase/ssr, and requireUser()/requireAdmin() helpers.
+
+Verification:
+- Run npm run build. The plan notes build may fail until pages exist; if it fails only because app layout/page files are missing, report that and treat syntax/type errors in new files as the key blocker.
+- Prefer also running npx tsc --noEmit if useful.
+
+Commit with message: feat: add supabase clients.
+```
+
+## Prompt 16 - Task 3 Cleanup: Next Generated Files
+
+- Agent: `019e6bff-3fdf-7631-aa51-a19765c3c7f5` / Bohr
+- Type: follow-up implementation instruction
+- Result: completed
+
+Message content:
+
+```text
+Please clean up verification-generated Next/TypeScript files before Task 3 review.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Current state after controller verification:
+- next-env.d.ts is untracked. This is a standard generated Next.js type file and should be tracked.
+- tsconfig.tsbuildinfo is untracked. This is an incremental TypeScript cache and should be ignored.
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md is modified by the controller to record prompts; you may update Prompt 16 result only if you commit successfully.
+
+Touch only:
+- next-env.d.ts
+- .gitignore
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+
+Required:
+- Add tsconfig.tsbuildinfo to .gitignore.
+- Keep next-env.d.ts tracked with the standard Next-generated contents.
+- Update Prompt 16 result to completed if you commit successfully.
+
+Verification:
+- git status --short should show only these files before commit.
+- git diff --check should pass.
+
+Commit with:
+- git add next-env.d.ts .gitignore docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "chore: track next types and ignore tsbuildinfo"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 15 - Task 3 Implementer
+
+- Agent: pending
+- Type: implementer
+- Result: pending
+
+Message content:
+
+```text
+You are implementing Task 3: Add Environment and Supabase Clients.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/lib/env.ts
+- src/lib/supabase/browser.ts
+- src/lib/supabase/server.ts
+- src/lib/auth/require-user.ts
+
+Task source: Task 3 from docs/superpowers/plans/2026-05-27-household-finance-mvp.md.
+
+Implement:
+1. Environment validation with Zod in src/lib/env.ts.
+2. Browser Supabase client using @supabase/ssr and public env.
+3. Server Supabase client using next/headers cookies and @supabase/ssr.
+4. requireUser() and requireAdmin() helpers that redirect to /login or /today.
+
+Verification:
+- Run npm run build. The plan notes build may fail until pages exist; if it fails only because app layout/page files are missing, report that and treat syntax/type errors in new files as the key blocker.
+- Prefer also running npx tsc --noEmit if useful.
+
+Commit with:
+- git add src/lib/env.ts src/lib/supabase/browser.ts src/lib/supabase/server.ts src/lib/auth/require-user.ts
+- git commit -m "feat: add supabase clients"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 10 - Task 2 Fix Request: Household-Local Constraints
 
 - Agent: `019e6bec-a03b-7130-9c61-3934a5fb4ff2` / Lorentz
