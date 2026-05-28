@@ -260,6 +260,50 @@ Use standard review output:
 Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
 ```
 
+## Prompt 32 - Task 6 Implementer
+
+- Agent: pending
+- Type: implementer
+- Result: completed in `feat: add invite-only login screen`
+
+Message content:
+
+```text
+You are implementing Task 6: Add Login and Logout.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/app/(auth)/login/page.tsx
+- src/app/actions/auth.ts
+- tests/e2e/app-shell.spec.ts, only to unskip/update the login smoke now that /login exists
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 32 result if you commit successfully
+
+Task requirements:
+1. Create src/app/actions/auth.ts with server actions:
+   - "use server"
+   - signIn(formData): read email/password, create Supabase server client, signInWithPassword, redirect /login?error=invalid on error, redirect /today on success.
+   - signOut(): sign out through Supabase server client, redirect /login.
+2. Create src/app/(auth)/login/page.tsx:
+   - heading Sign in
+   - invite-only access copy
+   - if searchParams.error === "invalid", show Email or password did not match.
+   - form action signIn with email/password fields and submit button.
+   - responsive centered panel using existing color system.
+3. Unskip tests/e2e/app-shell.spec.ts so it checks /login heading Sign in on desktop and mobile now that the route exists.
+
+Verification:
+- Run type check if practical.
+- Run unit tests if practical.
+- Run e2e smoke for tests/e2e/app-shell.spec.ts if practical.
+
+Commit with:
+- git add "src/app/(auth)/login/page.tsx" src/app/actions/auth.ts tests/e2e/app-shell.spec.ts docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "feat: add invite-only login screen"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 25 - Task 5 Implementer
 
 - Agent: `019e6c20-4b75-7531-8897-88e2fc5760f1` / Confucius
