@@ -31,13 +31,13 @@ export function AppShell({ children }: AppShellProps) {
         </nav>
       </aside>
 
-      <main className="min-h-screen px-4 pb-24 pt-5 sm:px-6 md:ml-64 md:px-8 md:pb-8 md:pt-8">
+      <main className="min-h-screen px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 sm:px-6 md:ml-64 md:px-8 md:pb-8 md:pt-8">
         <div className="mx-auto w-full max-w-6xl">{children}</div>
       </main>
 
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-20 grid h-20 grid-cols-4 border-t border-line bg-white/95 px-2 pb-2 pt-1 shadow-[0_-8px_24px_rgba(23,33,31,0.08)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 grid h-[calc(5rem+env(safe-area-inset-bottom))] grid-cols-4 border-t border-line bg-white/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_24px_rgba(23,33,31,0.08)] backdrop-blur md:hidden"
       >
         {navigation.map((item) => (
           <NavLink key={item.href} item={item} mobile />

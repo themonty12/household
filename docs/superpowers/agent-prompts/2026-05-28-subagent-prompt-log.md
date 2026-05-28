@@ -317,11 +317,106 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 27 - Task 5 Spec Review
+
+- Agent: `019e6cfe-0a0d-76d3-a954-ba73f46b0d37` / Parfit
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 5 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 5 required:
+- src/app/layout.tsx root layout with Metadata, globals.css, metadata title/description, html lang ko, body children.
+- src/app/page.tsx server home page that creates Supabase server client, calls auth.getUser(), redirects authenticated users to /today and unauthenticated users to /login.
+- src/components/app-shell.tsx responsive AppShell with desktop sidebar, mobile bottom nav, lucide icons, and nav items Today /today, Close /monthly-close, Assets /assets, Settings /settings.
+- src/components/summary-card.tsx reusable SummaryCard with label/value and tone neutral/positive/warning.
+- src/app/(app)/layout.tsx authenticated layout that awaits requireUser() and wraps children in AppShell.
+- tests/e2e/app-shell.spec.ts smoke test for /login heading Sign in. Login route is not expected until Task 6.
+
+Implementation commit: 2abd75b feat: add responsive app shell.
+
+Verify actual code against the task. Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 28 - Task 5 Code Quality Review
+
+- Agent: `019e6cff-ac20-7e90-8444-9c96a72da767` / Galileo
+- Type: code quality reviewer
+- Result: requested fixes/clarification for pre-Task-6 e2e dependency and minor UI semantics
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 5 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 5 added the root layout, home redirect page, authenticated layout, AppShell, SummaryCard, and e2e smoke test. Spec compliance already passed.
+
+Review current code and commit range 4cd19dc..2abd75b. Focus on:
+- Next.js App Router correctness.
+- Responsive app shell quality and mobile/desktop navigation.
+- Accessibility of nav links and icon usage.
+- Whether layout requires client components unnecessarily.
+- Whether SummaryCard styling is stable and not overbuilt.
+- Potential build/runtime issues caused by env parsing or redirects.
+- Whether e2e test is appropriate before Task 6.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 29 - Task 5 Fix Request: Pre-Task-6 Shell Cleanup
+
+- Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
+- Type: follow-up implementation instruction
+- Result: implemented and committed
+
+Message content:
+
+```text
+Please fix Task 5 code quality review issues that can be addressed without implementing Task 6 or Task 7.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/components/app-shell.tsx
+- src/components/summary-card.tsx
+- tests/e2e/app-shell.spec.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 29 result if you commit successfully
+
+Important scope boundary:
+- Do not create /login. That belongs to Task 6.
+- Do not create the real /today page. That belongs to Task 7.
+- Do not change env parsing in this fix; it belongs to Task 3 follow-up if we decide to do it.
+
+Required fixes:
+1. Mark the e2e smoke test skipped until Task 6 creates /login, with a clear short reason in the test title or skip callback. Keep the test file so Task 6 can unskip it.
+2. Add mobile safe-area bottom padding support to the bottom navigation.
+3. Change SummaryCard from an unnamed section to a semantically neutral div while preserving styling/API.
+
+Verification:
+- Run type check if practical.
+- Run unit tests if practical.
+- Run git diff --check.
+
+Commit with:
+- git add src/components/app-shell.tsx src/components/summary-card.tsx tests/e2e/app-shell.spec.ts docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: tidy pre-login shell checks"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 26 - Task 5 Implementer Retry
 
-- Agent: Codex
+- Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
 - Type: implementer
-- Result: implemented and committed
+- Result: implemented and committed in `2abd75b feat: add responsive app shell`
 
 Message content:
 

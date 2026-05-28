@@ -16,9 +16,9 @@ const toneClasses: Record<SummaryCardTone, string> = {
 
 export function SummaryCard({ label, value, tone = "neutral" }: SummaryCardProps) {
   return (
-    <section className={clsx("rounded-md border p-4 shadow-sm", toneClasses[tone])}>
+    <div className={clsx("rounded-md border p-4 shadow-sm", toneClasses[tone])}>
       <p className="text-sm font-medium text-ink/65">{label}</p>
       <p className="mt-2 text-2xl font-semibold tracking-normal text-current">{value}</p>
-    </section>
+    </div>
   );
 }
