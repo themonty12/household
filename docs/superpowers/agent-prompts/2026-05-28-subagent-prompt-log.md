@@ -260,6 +260,107 @@ Use standard review output:
 Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
 ```
 
+## Prompt 25 - Task 5 Implementer
+
+- Agent: `019e6c20-4b75-7531-8897-88e2fc5760f1` / Confucius
+- Type: implementer
+- Result: errored before implementation due usage limit
+
+Message content:
+
+```text
+You are implementing Task 5: Build the Authenticated App Shell.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/app/layout.tsx
+- src/app/page.tsx
+- src/app/(app)/layout.tsx
+- src/components/app-shell.tsx
+- src/components/summary-card.tsx
+- tests/e2e/app-shell.spec.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 25 result if you commit successfully
+
+Task requirements:
+1. Root layout in src/app/layout.tsx:
+   - import Metadata from next
+   - import ./globals.css
+   - metadata title Household Finance and description Invite-only household finance and asset management
+   - html lang ko and body children
+2. Home page in src/app/page.tsx:
+   - create server Supabase client
+   - auth.getUser()
+   - redirect authenticated users to /today, unauthenticated to /login
+3. AppShell in src/components/app-shell.tsx:
+   - responsive shell with desktop sidebar and mobile bottom nav
+   - nav items: Today /today Home icon, Close /monthly-close BarChart3, Assets /assets Landmark, Settings /settings Settings
+   - uses lucide-react icons
+   - stable, responsive, no decorative cards-within-cards
+4. SummaryCard in src/components/summary-card.tsx:
+   - reusable metric card with label/value and tone neutral/positive/warning
+5. Authenticated layout in src/app/(app)/layout.tsx:
+   - await requireUser()
+   - render AppShell around children
+6. E2E smoke test in tests/e2e/app-shell.spec.ts:
+   - login route renders heading Sign in on desktop/mobile. This will pass after Task 6 creates login route; do not create login route in Task 5.
+
+Verification:
+- Run type check if practical.
+- Run npm run test for unit tests if available.
+- Do not expect e2e to pass until Task 6; if you run it and /login is missing, report expected failure.
+
+Commit with:
+- git add src/app/layout.tsx src/app/page.tsx "src/app/(app)/layout.tsx" src/components/app-shell.tsx src/components/summary-card.tsx tests/e2e/app-shell.spec.ts docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "feat: add responsive app shell"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 26 - Task 5 Implementer Retry
+
+- Agent: Codex
+- Type: implementer
+- Result: implemented and committed
+
+Message content:
+
+```text
+You are implementing Task 5: Build the Authenticated App Shell.
+
+This is a retry because the previous Task 5 agent errored before implementation due usage limits.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/app/layout.tsx
+- src/app/page.tsx
+- src/app/(app)/layout.tsx
+- src/components/app-shell.tsx
+- src/components/summary-card.tsx
+- tests/e2e/app-shell.spec.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 26 result if you commit successfully
+
+Task requirements are identical to Prompt 25:
+1. Root layout with metadata, globals.css, html lang ko, and body children.
+2. Home page redirects authenticated users to /today and unauthenticated users to /login.
+3. Responsive AppShell with desktop sidebar, mobile bottom nav, lucide icons, and nav items Today/Close/Assets/Settings.
+4. SummaryCard with label/value and tone neutral/positive/warning.
+5. Authenticated app layout awaits requireUser() and wraps children in AppShell.
+6. E2E smoke test checks /login heading Sign in; it may fail until Task 6 creates /login.
+
+Verification:
+- Run type check if practical.
+- Run unit tests if available.
+- Do not expect e2e to pass until Task 6; report expected /login failure if observed.
+
+Commit with:
+- git add src/app/layout.tsx src/app/page.tsx "src/app/(app)/layout.tsx" src/components/app-shell.tsx src/components/summary-card.tsx tests/e2e/app-shell.spec.ts docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "feat: add responsive app shell"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 15 - Task 3 Implementer
 
 - Agent: `019e6bff-3fdf-7631-aa51-a19765c3c7f5` / Bohr
