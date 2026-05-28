@@ -210,6 +210,56 @@ Review commit range 5884868..9481218. Spec compliance already passed. Focus on S
 Use standard review output and Ready to merge verdict.
 ```
 
+## Prompt 23 - Task 4 Spec Re-Review
+
+- Agent: `019e6c1c-7969-70c1-a0c0-2ef4481165ab` / Erdos
+- Type: spec compliance re-reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are re-reviewing Task 4 spec compliance after quality fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Original Task 4 spec already passed. Fix commit 3065802 clarified budgetVariance semantics, unbudgeted spending insights, and distinct missing setup insight titles.
+
+Verify:
+- Original Task 4 required types/functions/tests still exist and behave as required.
+- Happy-path example still has budgetVariance 100, savingsRate 0.6, netWorthChange 1200.
+- Added semantics do not conflict with original spec.
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 24 - Task 4 Code Quality Re-Review
+
+- Agent: `019e6c1d-dd0d-7ab2-ab40-23ebd8159d67` / Descartes
+- Type: code quality re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are re-reviewing Task 4 code quality after fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous quality review found:
+1. budgetVariance ignored budgeted categories with zero spend.
+2. unbudgeted spending affected variance but had no insight.
+3. missing setup insights had duplicate titles.
+4. tests needed focused coverage for these cases.
+
+Fix commit: 3065802 fix: clarify budget variance insights.
+
+Review the current domain code and tests. Verify the previous issues are resolved without introducing new calculation or API problems. Focus on edge semantics, test quality, and whether the new insight titles/metrics are UI-friendly.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
 ## Prompt 15 - Task 3 Implementer
 
 - Agent: `019e6bff-3fdf-7631-aa51-a19765c3c7f5` / Bohr
@@ -335,7 +385,7 @@ Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with 
 
 - Agent: `019e6c10-8987-7cc0-9e50-267092f88b88` / Archimedes
 - Type: follow-up implementation instruction
-- Result: completed
+- Result: completed in `3065802 fix: clarify budget variance insights`
 
 Message content:
 
