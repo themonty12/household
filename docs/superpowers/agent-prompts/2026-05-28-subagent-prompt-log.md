@@ -304,6 +304,87 @@ Commit with:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 40 - Task 6 Final Spec Re-Review
+
+- Agent: `019e6d42-7772-7750-a267-a22ebd09987a` / Cicero
+- Type: spec compliance re-reviewer
+- Result: errored before review due usage limit
+
+Message content:
+
+```text
+You are doing the final Task 6 spec compliance re-review.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 6 spec previously passed. Subsequent fixes:
+- added temporary placeholders for /today, /monthly-close, /assets, /settings to satisfy typedRoutes and visible nav links.
+- fixed AppShell route typing.
+- moved typedRoutes config to top level.
+- moved Playwright to isolated port 3100.
+
+Verify Task 6 still satisfies login/logout requirements and e2e /login Sign in smoke test is active. Confirm placeholder pages are minimal and do not implement later task UI.
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 41 - Task 6 Final Spec Re-Review Retry
+
+- Agent: `019e70f7-f36d-7ce3-8cd8-2e3e40fa997f` / Fermat
+- Type: spec compliance re-reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are doing the final Task 6 spec compliance re-review.
+
+This is a retry because the previous reviewer errored before review due usage limits.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 6 spec previously passed. Subsequent fixes:
+- added temporary placeholders for /today, /monthly-close, /assets, /settings to satisfy typedRoutes and visible nav links.
+- fixed AppShell route typing.
+- moved typedRoutes config to top level.
+- moved Playwright to isolated port 3100.
+
+Verify Task 6 still satisfies login/logout requirements and e2e /login Sign in smoke test is active. Confirm placeholder pages are minimal and do not implement later task UI.
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 42 - Task 6 Final Code Quality Re-Review
+
+- Agent: `019e70fb-516b-7581-8f8d-b929b6026efb` / Dalton
+- Type: code quality re-reviewer
+- Result: requested package-lock SWC optional dependency commit
+
+Message content:
+
+```text
+You are doing the final Task 6 code quality re-review.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous quality issues:
+- /today missing caused typedRoutes build failure.
+- AppShell had unsafe casts for missing visible nav routes.
+- Playwright reused port 3000 and collided with another app.
+- next.config used deprecated experimental.typedRoutes.
+
+Fixes:
+- placeholder routes exist for visible nav routes.
+- AppShell route typing fixed without unsafe casts.
+- Playwright uses isolated port 3100.
+- next.config uses top-level typedRoutes.
+
+Spec re-review passed. Review for any remaining blockers or regressions. Pay attention to build/e2e reliability, placeholder scope, login action/page security/accessibility, and prompt-log-only dirty state.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
 ## Prompt 37 - Task 6 Spec Re-Review
 
 - Agent: `019e6d24-a399-7da1-b7fd-740f64f3273c` / Hilbert
@@ -365,7 +446,7 @@ Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with 
 
 - Agent: `019e6cfa-a42d-7d42-a8da-327c7d76b189` / Erdos
 - Type: follow-up implementation instruction
-- Result: implemented and committed
+- Result: completed in `560b77a fix: stabilize shell routes and e2e port`
 
 Message content:
 
