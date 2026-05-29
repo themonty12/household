@@ -280,6 +280,140 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 67 - Task 9 Final Code Quality Re-Review
+
+- Agent: `019e7230-abf8-7a21-8602-6dc70fa836db` / Peirce
+- Type: code quality re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are doing the final Task 9 code quality re-review after minor polish.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous Task 9 review was ready to merge with minor recommendations:
+1. Hide Settings navigation from non-admin users while keeping requireAdmin() as the authorization boundary.
+2. Improve the first-admin setup SQL comment to avoid orphan-prone two-step setup.
+
+Fix commit:
+- cd217a9 fix: hide admin settings nav for members
+
+Review current code and relevant range b9303b9..cd217a9. Verify the minor recommendations are resolved without regressions.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 64 - Task 9 Spec Review
+
+- Agent: `019e7228-aac8-79d3-ad4a-0744b010faa3` / Ohm
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 9 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 9 required:
+- Replace src/app/(app)/settings/page.tsx with an admin-only page using requireAdmin().
+- Render current admin display name.
+- Render concise next setup actions:
+  - Create household accounts in Supabase.
+  - Create income and expense categories.
+  - Create monthly category budgets.
+  - Invite family members through Supabase Auth.
+- Append first-admin setup SQL comments to the end of supabase/migrations/0001_initial_schema.sql:
+  - insert household example
+  - insert profile example using AUTH_USER_UUID and admin role
+- Build/typecheck should remain passing.
+
+Implementation commit:
+- b9303b9 feat: add admin settings page
+
+Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
+```
+
+## Prompt 65 - Task 9 Code Quality Review
+
+- Agent: `019e722a-af4b-7592-8fa5-16c9bde40385` / Averroes
+- Type: code quality reviewer
+- Result: ready to merge with minor recommendations for admin nav visibility and transactional seed comment
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 9 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 9 added the admin settings page and first-admin setup SQL comments. Spec compliance passed.
+
+Review current code and commit range 0020914..b9303b9. Focus on:
+- Correct admin guard usage and security implications.
+- Settings page UI consistency with existing app pages.
+- SQL comment safety/usefulness for first-admin setup.
+- Build/typecheck implications.
+- Any unintended migration or app behavior changes.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 66 - Task 9 Minor Polish Fix
+
+- Agent: `019e722d-5fd0-75f0-a54c-4341c3c7ced5` / Gauss
+- Type: follow-up implementation instruction
+- Result: completed in `cd217a9 fix: hide admin settings nav for members`
+
+Message content:
+
+```text
+Please apply the minor Task 9 code quality recommendations only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Touch only:
+- src/components/app-shell.tsx
+- src/app/(app)/layout.tsx
+- supabase/migrations/0001_initial_schema.sql
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 66 result if you commit successfully
+
+Required fixes:
+1. Hide the Settings navigation item for non-admin users:
+   - Keep requireAdmin() on the settings page as the true authorization boundary.
+   - Pass the current profile role from the authenticated layout into AppShell.
+   - Filter Settings from desktop and mobile navigation unless role is admin.
+   - Preserve existing navigation layout and typed routes.
+2. Improve the first-admin setup SQL comments:
+   - Keep comments only; do not alter migration behavior.
+   - Use a transactional or CTE-style example so household/profile setup is safer than a two-step orphan-prone snippet.
+
+Verification:
+- Run npm exec tsc -- --noEmit.
+- Run next build with placeholder Supabase env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: hide admin settings nav for members
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 62 - Task 8 Code Quality Re-Review
 
 - Agent: `019e7222-6160-7b33-9669-89aa2bf292f1` / Euclid
@@ -310,6 +444,47 @@ Use standard review output:
 - Assessment with Ready to merge verdict
 
 Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 63 - Task 9 Implementer
+
+- Agent: `019e7224-f6da-72b0-bc26-05bcc5cd089a` / Turing
+- Type: implementer
+- Result: completed in `b9303b9 feat: add admin settings page`
+
+Message content:
+
+```text
+You are implementing Task 9: Add Settings Seeds and Admin Guard.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/app/(app)/settings/page.tsx
+- supabase/migrations/0001_initial_schema.sql
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 63 result if you commit successfully
+
+Required implementation:
+1. Replace the settings page placeholder with an admin-only page using requireAdmin().
+2. Render current admin display name and concise next setup actions:
+   - Create household accounts in Supabase.
+   - Create income and expense categories.
+   - Create monthly category budgets.
+   - Invite family members through Supabase Auth.
+3. Keep layout consistent with existing app pages: compact, responsive, no marketing copy.
+4. Append first-admin setup SQL comments to the end of supabase/migrations/0001_initial_schema.sql:
+   - insert household example
+   - insert profile example using AUTH_USER_UUID and admin role
+
+Verification:
+- Run npm exec tsc -- --noEmit.
+- Run next build with placeholder Supabase env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- feat: add admin settings page
+
+Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
 ## Prompt 57 - Task 8 Spec Review
