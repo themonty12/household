@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createTransaction } from "@/app/actions/transactions";
 import type { TodayAccount, TodayCategory } from "@/lib/repositories/finance";
@@ -30,9 +30,14 @@ function todayDate() {
 
 export function TransactionForm({ accounts, categories }: TransactionFormProps) {
   const [transactionType, setTransactionType] = useState<TransactionType>("expense");
+  const [date, setDate] = useState("");
   const [accountId, setAccountId] = useState("");
   const [toAccountId, setToAccountId] = useState("");
   const isTransfer = transactionType === "transfer";
+
+  useEffect(() => {
+    setDate(todayDate());
+  }, []);
 
   return (
     <form
@@ -62,7 +67,8 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           <input
             name="date"
             type="date"
-            defaultValue={todayDate()}
+            value={date}
+            onChange={(event) => setDate(event.target.value)}
             required
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
           />

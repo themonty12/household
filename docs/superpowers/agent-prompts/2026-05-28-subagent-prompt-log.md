@@ -280,6 +280,76 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 53 - Task 7 Final Code Quality Re-Review
+
+- Agent: `019e711e-9a04-7020-ba48-75c591f817b9` / McClintock
+- Type: code quality re-reviewer
+- Result: not ready; client-local date default still computed during render
+
+Message content:
+
+```text
+You are doing the final Task 7 code quality re-review after validation and form polish fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous final quality review found:
+1. transactionSchema accepted transfer+categoryId and non-transfer+toAccountId shapes that violate DB constraints.
+2. TransactionForm allowed same-account transfer destination.
+3. TransactionForm default date used UTC toISOString slicing.
+4. Account snapshot grid dividers could look odd when wrapping.
+5. Tests missed forbidden-field cases.
+
+Fix commit:
+- d8b7059 fix: align transaction validation and form defaults
+
+Review current code and relevant range 7b17c95..d8b7059. Verify those issues are resolved without creating regressions. Also sanity-check the overall Task 7 code quality.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 54 - Task 7 Fix Request: Client-Local Date Default
+
+- Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
+- Type: follow-up implementation instruction
+- Result: completed in `fix: initialize transaction date on client`
+
+Message content:
+
+```text
+Please fix the remaining Task 7 code quality issue only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. You are not alone in the codebase. Touch only:
+- src/components/forms/transaction-form.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 54 result if you commit successfully
+
+Issue:
+- transaction-form.tsx changed the date helper to local date, but it is still computed during render in a client component that can be server-rendered before hydration. If the Vercel server timezone differs from the browser timezone, the default date can still be wrong.
+
+Required fix:
+- Initialize the date input on the browser after mount, e.g. controlled date state initialized to empty string and set to todayDate() inside useEffect.
+- Preserve existing form behavior, including same-account transfer prevention and type-aware fields.
+
+Verification:
+- Run type check.
+- Run relevant tests if practical.
+- Run next build with required env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: initialize transaction date on client
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 50 - Task 7 Final Spec Re-Review
 
 - Agent: `019e7115-a6b7-72e0-85a6-8fe0bf89569e` / Jason
@@ -345,7 +415,7 @@ Do not edit files. Do not revert changes. If you find an issue, include exact fi
 
 - Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
 - Type: follow-up implementation instruction
-- Result: completed in `fix: align transaction validation and form defaults`
+- Result: completed in `d8b7059 fix: align transaction validation and form defaults`
 
 Message content:
 
