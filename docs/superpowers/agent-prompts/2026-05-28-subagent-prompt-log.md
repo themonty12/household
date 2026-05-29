@@ -309,6 +309,146 @@ Implementation commit:
 Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
 ```
 
+## Prompt 60 - Task 8 Code Quality Review
+
+- Agent: `019e7218-f743-7961-a6a0-37dfa5a6c459` / Tesla
+- Type: code quality reviewer
+- Result: not ready; requested admin-only regenerate alignment and honest fixed_cost_ratio handling
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 8 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 8 added assets, monthly close repository/action, and monthly close insight screens. Spec compliance passed after commits:
+- d842223 feat: add assets and monthly close
+- 852b360 fix: align monthly close repository behavior
+
+Review current code and commit range 4e51a5d..852b360. Focus on:
+- Supabase query correctness and PostgREST behavior, including maybeSingle with limit/order, error handling, row typing, and RLS assumptions.
+- Monthly close calculation/input mapping correctness, including nullable category/toAccount fields and generated_at.
+- Server action safety, month validation, revalidation behavior, and admin/RLS implications.
+- Assets and monthly close UI quality, responsive behavior, empty states, and consistency with existing app style.
+- Tests added and any important missing coverage.
+- Any regressions to Task 7 Today/transaction behavior.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 61 - Task 8 Fix Request: Admin Regenerate And Fixed Ratio
+
+- Agent: `019e721d-8614-7563-87c5-138792fc2613` / Hegel
+- Type: follow-up implementation instruction
+- Result: completed in `113c2b1 fix: align monthly close admin behavior`
+
+Message content:
+
+```text
+Please fix Task 8 code quality review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Touch only:
+- src/app/actions/monthly-close.ts
+- src/app/(app)/monthly-close/page.tsx
+- src/lib/repositories/monthly-close.ts
+- tests/repositories/monthly-close.test.ts
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 61 result if you commit successfully
+
+Required fixes:
+1. Align monthly close regeneration with RLS:
+   - Use requireAdmin() in regenerateMonthlyClose because monthly_closes writes are admin-only in RLS.
+   - Hide or disable the Regenerate control for non-admin users on the monthly close page. Reads should still work for active users.
+2. Avoid misleading fixed_cost_ratio:
+   - Since the schema has no fixed/variable category metadata yet, do not store 0 as if it were a real fixed-cost ratio.
+   - Store fixed_cost_ratio as null until the app has enough data to calculate it honestly.
+   - Keep other monthly close metrics unchanged.
+   - Update the repository test expectation.
+3. Optional small polish:
+   - If cheap, handle invalid month query/action input gracefully enough to avoid a raw 500, but do not expand scope.
+
+Verification:
+- Run npm run test.
+- Run npm exec tsc -- --noEmit.
+- Run next build with placeholder Supabase env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: align monthly close admin behavior
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 59 - Task 8 Spec Re-Review Retry
+
+- Agent: `019e7216-f55b-7b23-a18e-51844318fb9d` / Dirac
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 8 spec compliance after a local coordinator fix.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 8 required:
+- Extend src/lib/repositories/finance.ts with getAssetsData and getMonthlyCloseData.
+- getAssetsData must fetch active accounts with id/name/type/current_balance/include_in_net_worth.
+- getMonthlyCloseData must fetch posted month transactions, budgets, current monthly snapshot, previous snapshot, and saved close, and throw on Supabase errors.
+- Previous snapshot should be the latest monthly snapshot before the selected month, not only the immediately prior calendar month.
+- Create src/lib/repositories/monthly-close.ts with upsertMonthlyClose writing metrics, insight_items, and generated_at to monthly_closes using onConflict household_id,month.
+- Create src/app/actions/monthly-close.ts with regenerateMonthlyClose requiring user, parsing month, fetching monthly data, calculating metrics, generating insights, upserting close, and revalidating /monthly-close.
+- Replace src/app/(app)/assets/page.tsx with data-backed assets/liabilities/net-worth summary and account list.
+- Replace src/app/(app)/monthly-close/page.tsx with data-backed monthly close summary, regenerate form, and insights list/empty state.
+- Tests/build should remain passing.
+
+Implementation/fix commits:
+- d842223 feat: add assets and monthly close
+- 852b360 fix: align monthly close repository behavior
+
+Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
+```
+
+## Prompt 58 - Task 8 Spec Re-Review
+
+- Agent: `019e7130-fe93-7752-9b17-9e5251414efc` / Franklin
+- Type: spec compliance reviewer
+- Result: errored because agent usage limit was reached
+
+Message content:
+
+```text
+You are reviewing Task 8 spec compliance after a local coordinator fix.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 8 required:
+- Extend src/lib/repositories/finance.ts with getAssetsData and getMonthlyCloseData.
+- getAssetsData must fetch active accounts with id/name/type/current_balance/include_in_net_worth.
+- getMonthlyCloseData must fetch posted month transactions, budgets, current monthly snapshot, previous snapshot, and saved close, and throw on Supabase errors.
+- Previous snapshot should be the latest monthly snapshot before the selected month, not only the immediately prior calendar month.
+- Create src/lib/repositories/monthly-close.ts with upsertMonthlyClose writing metrics, insight_items, and generated_at to monthly_closes using onConflict household_id,month.
+- Create src/app/actions/monthly-close.ts with regenerateMonthlyClose requiring user, parsing month, fetching monthly data, calculating metrics, generating insights, upserting close, and revalidating /monthly-close.
+- Replace src/app/(app)/assets/page.tsx with data-backed assets/liabilities/net-worth summary and account list.
+- Replace src/app/(app)/monthly-close/page.tsx with data-backed monthly close summary, regenerate form, and insights list/empty state.
+- Tests/build should remain passing.
+
+Implementation/fix commits:
+- d842223 feat: add assets and monthly close
+- 852b360 fix: align monthly close repository behavior
+
+Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
+```
+
 ## Prompt 55 - Task 7 Final Code Quality Re-Review
 
 - Agent: `019e7123-967e-7862-8d03-5ba88c4c04c3` / Locke
