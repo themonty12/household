@@ -28,6 +28,33 @@ describe("transactionSchema", () => {
     expect(result.error?.issues.some((issue) => issue.path.includes("toAccountId"))).toBe(true);
   });
 
+  it("rejects transfer to the same account", () => {
+    const result = transactionSchema.safeParse({
+      date: "2026-05-29",
+      type: "transfer",
+      amount: "10000",
+      accountId: "checking",
+      toAccountId: "checking"
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((issue) => issue.path.includes("toAccountId"))).toBe(true);
+  });
+
+  it("accepts transfer between different accounts without category", () => {
+    const transaction = transactionSchema.parse({
+      date: "2026-05-29",
+      type: "transfer",
+      amount: "10000",
+      accountId: "checking",
+      toAccountId: "savings",
+      categoryId: ""
+    });
+
+    expect(transaction.toAccountId).toBe("savings");
+    expect(transaction.categoryId).toBeUndefined();
+  });
+
   it("rejects adjustment without category", () => {
     const result = transactionSchema.safeParse({
       date: "2026-05-29",

@@ -262,9 +262,9 @@ Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with 
 
 ## Prompt 44 - Task 7 Implementer
 
-- Agent: Codex
+- Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
 - Type: implementer
-- Result: implemented and committed
+- Result: completed in `ded3b48 feat: add transaction entry`
 
 Message content:
 
@@ -325,6 +325,109 @@ Verification:
 Commit with:
 - git add src/lib/validation tests/validation src/components/forms src/app/actions/transactions.ts src/lib/repositories/finance.ts "src/app/(app)/today/page.tsx" docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
 - git commit -m "feat: add transaction entry"
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 45 - Task 7 Spec Review
+
+- Agent: `019e7108-7d68-7ff1-a7c8-a86777ac28f5` / Plato
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 7 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 7 required:
+- src/lib/validation/transaction.ts with transactionSchema and tests for positive expense, transfer missing destination rejection, and adjustment missing category rejection.
+- src/lib/repositories/finance.ts with getTodayData fetching active accounts, active categories, recent posted transactions and throwing on errors.
+- src/app/actions/transactions.ts with createTransaction server action using requireUser, transactionSchema, insert into transactions, transfer/non-transfer column handling, revalidate /today and /monthly-close.
+- src/components/forms/transaction-form.tsx with amount/date/type/account/category/memo fields and action createTransaction.
+- src/app/(app)/today/page.tsx real Today screen using requireUser, getTodayData, summary cards, TransactionForm, recent transaction list.
+
+Implementation commit: ded3b48 feat: add transaction entry.
+
+Verify actual code and tests against the task. Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 46 - Task 7 Code Quality Review
+
+- Agent: `019e7109-fd84-71d1-8068-865c4553ae56` / Raman
+- Type: code quality reviewer
+- Result: requested fixes for Supabase relation alias, transfer validation, form UX, and summary label
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 7 code quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 7 added transaction validation, transaction create action, finance repository, TransactionForm, and real Today screen. Spec compliance passed.
+
+Review current code and commit range 27f0af8..ded3b48. Focus on:
+- Validation alignment with DB constraints, including transfer/category behavior.
+- Server action security and RLS assumptions.
+- Supabase query correctness and whether selected relation aliases match rendered data.
+- UX problems from static form fields, especially transfer destination/category requirements.
+- Type safety and build reliability.
+- Today screen summary correctness.
+- Test quality and missing edge cases that should block now.
+
+Use standard review output:
+Strengths, Issues by Critical/Important/Minor, Recommendations, Assessment with Ready to merge verdict.
+```
+
+## Prompt 47 - Task 7 Fix Request: Transaction Runtime And UX Issues
+
+- Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
+- Type: follow-up implementation instruction
+- Result: completed in `fix: harden transaction entry flow`
+
+Message content:
+
+```text
+Please fix Task 7 code quality review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. Touch only:
+- src/lib/validation/transaction.ts
+- tests/validation/transaction.test.ts
+- src/lib/repositories/finance.ts
+- src/components/forms/transaction-form.tsx
+- src/app/(app)/today/page.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 47 result if you commit successfully
+
+Required fixes:
+1. Disambiguate the category embed in getTodayData:
+   - Use an explicit relation for categories, e.g. `categories!transactions_category_id_fkey(name)`, to avoid PostgREST ambiguity with composite household FK.
+   - Keep account relation aliases explicit.
+2. Add validation that transfer `toAccountId` must differ from `accountId`.
+   - Add a focused test for same-account transfer rejection.
+   - Add a valid transfer test if cheap.
+3. Improve TransactionForm UX without overbuilding:
+   - Make transaction type selection client-aware enough that users can see which fields matter.
+   - For transfer, show/require destination account and do not require category.
+   - For non-transfer, show/require category and avoid submitting a destination account.
+   - Keep form compact and responsive.
+4. Fix Today summary label:
+   - If it still sums only recent fetched transactions, rename the card to `Shown expenses`.
+   - Do not claim month/today aggregate unless you fetch that aggregate.
+
+Verification:
+- Run validation/domain tests.
+- Run type check.
+- Run build with required env vars if practical.
+- Run git diff --check.
+
+Commit with:
+- git add src/lib/validation/transaction.ts tests/validation/transaction.test.ts src/lib/repositories/finance.ts src/components/forms/transaction-form.tsx "src/app/(app)/today/page.tsx" docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md
+- git commit -m "fix: harden transaction entry flow"
 
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```

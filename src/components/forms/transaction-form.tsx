@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import { createTransaction } from "@/app/actions/transactions";
 import type { TodayAccount, TodayCategory } from "@/lib/repositories/finance";
 
@@ -11,15 +15,23 @@ const transactionTypes = [
   { value: "income", label: "Income" },
   { value: "transfer", label: "Transfer" },
   { value: "adjustment", label: "Adjustment" }
-];
+] as const;
+
+type TransactionType = (typeof transactionTypes)[number]["value"];
 
 function todayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
 export function TransactionForm({ accounts, categories }: TransactionFormProps) {
+  const [transactionType, setTransactionType] = useState<TransactionType>("expense");
+  const isTransfer = transactionType === "transfer";
+
   return (
-    <form action={createTransaction} className="space-y-4 rounded-md border border-line bg-white p-4 shadow-sm">
+    <form
+      action={createTransaction}
+      className="space-y-4 rounded-md border border-line bg-white p-4 shadow-sm"
+    >
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-semibold tracking-normal text-ink">Add transaction</h2>
       </div>
@@ -53,7 +65,8 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           Type
           <select
             name="type"
-            defaultValue="expense"
+            value={transactionType}
+            onChange={(event) => setTransactionType(event.target.value as TransactionType)}
             required
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
           >
@@ -81,35 +94,39 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          Category
-          <select
-            name="categoryId"
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
-          >
-            <option value="">None</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          To account
-          <select
-            name="toAccountId"
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
-          >
-            <option value="">None</option>
-            {accounts.map((account) => (
-              <option key={account.id} value={account.id}>
-                {account.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {isTransfer ? (
+          <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+            To account
+            <select
+              name="toAccountId"
+              required
+              className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            >
+              <option value="">Choose destination</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+            Category
+            <select
+              name="categoryId"
+              required
+              className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            >
+              <option value="">Choose category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75 sm:col-span-2">
           Memo

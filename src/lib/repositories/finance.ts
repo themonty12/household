@@ -57,7 +57,7 @@ export async function getTodayData(
     supabase
       .from("transactions")
       .select(
-        "id, date, type, amount, account_id, to_account_id, category_id, memo, created_at, accounts!transactions_account_id_fkey(name), to_account:accounts!transactions_to_account_id_fkey(name), categories(name)"
+        "id, date, type, amount, account_id, to_account_id, category_id, memo, created_at, accounts!transactions_account_id_fkey(name), to_account:accounts!transactions_to_account_id_fkey(name), categories!transactions_category_id_fkey(name)"
       )
       .eq("household_id", householdId)
       .eq("status", "posted")

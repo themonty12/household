@@ -32,6 +32,14 @@ export const transactionSchema = z
         });
       }
 
+      if (transaction.toAccountId === transaction.accountId) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Transfer destination must be different from the source account.",
+          path: ["toAccountId"]
+        });
+      }
+
       return;
     }
 

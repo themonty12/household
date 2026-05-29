@@ -38,7 +38,7 @@ export default async function TodayPage() {
       </div>
 
       <section aria-label="Today summary" className="grid gap-3 sm:grid-cols-3">
-        <SummaryCard label="Recent expenses" value={formatWon(recentExpenseTotal)} tone="warning" />
+        <SummaryCard label="Shown expenses" value={formatWon(recentExpenseTotal)} tone="warning" />
         <SummaryCard label="Active accounts" value={accounts.length.toString()} />
         <SummaryCard label="Active categories" value={categories.length.toString()} tone="positive" />
       </section>
