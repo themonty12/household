@@ -311,6 +311,53 @@ Use standard review output:
 Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
 ```
 
+## Prompt 68 - Task 10 Implementer
+
+- Agent: `019e7233-1b0d-7e41-9d06-bbd3f0230b83` / Erdos
+- Type: implementer
+- Result: completed in `d8b5f80 docs: add deployment checklist`
+
+Message content:
+
+```text
+You are implementing Task 10: Final Verification and Vercel/Supabase Deployment Checklist.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- docs/deployment.md
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 68 result if you commit successfully
+
+Required implementation:
+1. Create docs/deployment.md.
+2. Include Supabase setup steps:
+   - create project
+   - disable public sign-up / keep access invite-only
+   - apply migrations
+   - create first Auth user
+   - insert household/admin profile using SQL note in supabase/migrations/0001_initial_schema.sql
+   - confirm RLS on finance tables
+3. Include Vercel setup:
+   - required env vars NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_APP_URL
+   - repository root deployment and npm run build command
+4. Include verification:
+   - before deployment: npm run test, npm run build, npm run test:e2e
+   - after deployment: login flow, /today, /assets, /monthly-close, /settings, sample account/category/transaction/monthly close flow
+   - note /settings and monthly close regenerate are admin-only
+5. Keep it concise, practical, and specific to this MVP.
+
+Verification:
+- Run npm run test.
+- Run next build with placeholder Supabase env vars.
+- Run npm run test:e2e if practical.
+- Run git diff --check.
+
+Commit with message:
+- docs: add deployment checklist
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 64 - Task 9 Spec Review
 
 - Agent: `019e7228-aac8-79d3-ad4a-0744b010faa3` / Ohm
