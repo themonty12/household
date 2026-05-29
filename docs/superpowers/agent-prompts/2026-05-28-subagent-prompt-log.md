@@ -210,6 +210,76 @@ Review commit range 5884868..9481218. Spec compliance already passed. Focus on S
 Use standard review output and Ready to merge verdict.
 ```
 
+## Prompt 48 - Task 7 Spec Re-Review
+
+- Agent: `019e7110-7fa7-7a80-b914-75af2fc7c65f` / Rawls
+- Type: spec compliance re-reviewer
+- Result: not spec compliant; missing account snapshot list on Today page
+
+Message content:
+
+```text
+You are re-reviewing Task 7 spec compliance after quality fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Original Task 7 required:
+- src/lib/validation/transaction.ts with transactionSchema and tests for positive expense, transfer missing destination rejection, and adjustment missing category rejection.
+- src/lib/repositories/finance.ts with getTodayData fetching active accounts, active categories, recent posted transactions and throwing on errors.
+- src/app/actions/transactions.ts with createTransaction server action using requireUser, transactionSchema, insert into transactions, transfer/non-transfer column handling, revalidate /today and /monthly-close.
+- src/components/forms/transaction-form.tsx with amount/date/type/account/category/memo fields and action createTransaction.
+- src/app/(app)/today/page.tsx using getTodayData, TransactionForm, summary cards, recent transactions list, and account snapshot list.
+
+Fix commits to include:
+- ded3b48 feat: add transaction entry
+- 84d3584 fix: harden transaction entry flow
+
+Verify the current implementation still satisfies Task 7 after fixes for:
+- explicit Supabase category relation alias
+- same-account transfer validation
+- type-aware form fields for transfer vs non-transfer
+- Today summary label renamed when it only sums shown transactions
+
+Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 49 - Task 7 Fix Request: Account Snapshot List
+
+- Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
+- Type: follow-up implementation instruction
+- Result: completed in `fix: add today account snapshot`
+
+Message content:
+
+```text
+Please fix the remaining Task 7 spec compliance issue only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. You are not alone in the codebase. Touch only:
+- src/app/(app)/today/page.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 49 result if you commit successfully
+
+Issue:
+- The Today page renders summary cards, TransactionForm, and recent transactions, but it does not render the required account snapshot list using accounts/current_balance.
+
+Required fix:
+- Add a compact responsive account snapshot/list section to src/app/(app)/today/page.tsx.
+- Use existing getTodayData accounts data.
+- Show account name, account type, and current balance formatted with the existing money formatting helper/style used nearby.
+- Preserve the existing Today page layout and do not expand scope into account management.
+
+Verification:
+- Run type check.
+- Run relevant tests if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: add today account snapshot
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 23 - Task 4 Spec Re-Review
 
 - Agent: `019e6c1c-7969-70c1-a0c0-2ef4481165ab` / Erdos

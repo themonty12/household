@@ -43,6 +43,37 @@ export default async function TodayPage() {
         <SummaryCard label="Active categories" value={categories.length.toString()} tone="positive" />
       </section>
 
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-semibold tracking-normal text-ink">Account snapshot</h2>
+          <span className="text-sm text-ink/60">{accounts.length} active</span>
+        </div>
+
+        <div className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
+          {accounts.length === 0 ? (
+            <p className="p-4 text-sm text-ink/65">No active accounts yet.</p>
+          ) : (
+            <ul className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
+              {accounts.map((account) => (
+                <li key={account.id} className="min-w-0 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">{account.name}</p>
+                      <p className="mt-1 text-xs uppercase tracking-normal text-ink/55">
+                        {account.type}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-sm font-semibold text-ink">
+                      {formatWon(Number(account.current_balance))}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
       <TransactionForm accounts={accounts} categories={categories} />
 
       <section className="space-y-3">
