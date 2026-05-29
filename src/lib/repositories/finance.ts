@@ -167,13 +167,6 @@ export function nextMonth(month: string): string {
   return formatMonthDate(date);
 }
 
-function previousMonth(month: string): string {
-  const normalized = normalizeMonth(month);
-  const date = new Date(`${normalized}T00:00:00.000Z`);
-  date.setUTCMonth(date.getUTCMonth() - 1);
-  return formatMonthDate(date);
-}
-
 function formatMonthDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
@@ -205,7 +198,6 @@ export async function getMonthlyCloseData(
 ): Promise<MonthlyCloseData> {
   const monthStart = normalizeMonth(month);
   const nextMonthStart = nextMonth(monthStart);
-  const previousMonthStart = previousMonth(monthStart);
 
   const [
     accountsResult,
@@ -244,7 +236,9 @@ export async function getMonthlyCloseData(
       .from("monthly_snapshots")
       .select("month, total_assets, total_liabilities, net_worth")
       .eq("household_id", householdId)
-      .eq("month", previousMonthStart)
+      .lt("month", monthStart)
+      .order("month", { ascending: false })
+      .limit(1)
       .maybeSingle(),
     supabase
       .from("monthly_closes")

@@ -280,6 +280,35 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 57 - Task 8 Spec Review
+
+- Agent: `019e712e-1858-7c01-85dd-df6100298b6e` / James
+- Type: spec compliance reviewer
+- Result: errored because agent usage limit was reached; local coordinator review found previous snapshot query and generated_at update gaps
+
+Message content:
+
+```text
+You are reviewing Task 8 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 8 required:
+- Extend src/lib/repositories/finance.ts with getAssetsData and getMonthlyCloseData.
+- getAssetsData must fetch active accounts with id/name/type/current_balance/include_in_net_worth.
+- getMonthlyCloseData must fetch posted month transactions, budgets, current monthly snapshot, previous snapshot, and saved close, and throw on Supabase errors.
+- Create src/lib/repositories/monthly-close.ts with upsertMonthlyClose writing metrics and insight_items to monthly_closes using onConflict household_id,month.
+- Create src/app/actions/monthly-close.ts with regenerateMonthlyClose requiring user, parsing month, fetching monthly data, calculating metrics, generating insights, upserting close, and revalidating /monthly-close.
+- Replace src/app/(app)/assets/page.tsx with data-backed assets/liabilities/net-worth summary and account list.
+- Replace src/app/(app)/monthly-close/page.tsx with data-backed monthly close summary, regenerate form, and insights list/empty state.
+- Tests/build should remain passing.
+
+Implementation commit:
+- d842223 feat: add assets and monthly close
+
+Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
+```
+
 ## Prompt 55 - Task 7 Final Code Quality Re-Review
 
 - Agent: `019e7123-967e-7862-8d03-5ba88c4c04c3` / Locke

@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { nextMonth } from "../../src/lib/repositories/finance";
+import { nextMonth, normalizeMonth } from "../../src/lib/repositories/finance";
 import { upsertMonthlyClose } from "../../src/lib/repositories/monthly-close";
 import type { InsightItem, MonthlyCloseMetrics } from "../../src/lib/domain/types";
 
 describe("monthly close repositories", () => {
   it("calculates the next month from a month boundary date", () => {
     expect(nextMonth("2026-12-01")).toBe("2027-01-01");
+  });
+
+  it("normalizes a month input to the first day of that month", () => {
+    expect(normalizeMonth("2026-05")).toBe("2026-05-01");
+    expect(normalizeMonth("2026-05-20")).toBe("2026-05-01");
   });
 
   it("upserts monthly close metrics and insights by household and month", async () => {
@@ -48,23 +53,25 @@ describe("monthly close repositories", () => {
 
     await upsertMonthlyClose(supabase as never, "household-1", metrics, insights);
 
-    expect(upsertCalls).toEqual([
-      {
-        table: "monthly_closes",
-        payload: {
-          household_id: "household-1",
-          month: "2026-05-01",
-          income_total: 5000,
-          expense_total: 3200,
-          transfer_total: 750,
-          budget_variance: 200,
-          savings_rate: 0.36,
-          fixed_cost_ratio: 0.42,
-          net_worth_change: 1200,
-          insight_items: insights
-        },
-        options: { onConflict: "household_id,month" }
-      }
-    ]);
+    expect(upsertCalls).toHaveLength(1);
+    expect(upsertCalls[0]).toMatchObject({
+      table: "monthly_closes",
+      payload: {
+        household_id: "household-1",
+        month: "2026-05-01",
+        income_total: 5000,
+        expense_total: 3200,
+        transfer_total: 750,
+        budget_variance: 200,
+        savings_rate: 0.36,
+        fixed_cost_ratio: 0.42,
+        net_worth_change: 1200,
+        insight_items: insights
+      },
+      options: { onConflict: "household_id,month" }
+    });
+    expect(
+      (upsertCalls[0] as { payload: { generated_at: string } }).payload.generated_at
+    ).toEqual(expect.any(String));
   });
 });
