@@ -313,6 +313,78 @@ Use standard review output:
 Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
 ```
 
+## Prompt 56 - Task 8 Implementer
+
+- Agent: `019e7127-6b88-7521-9cb7-f8ac9694341a` / Sagan
+- Type: implementer
+- Result: success
+
+Message content:
+
+```text
+You are implementing Task 8: Add Assets, Monthly Close, and Insight Screens.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Only touch:
+- src/lib/repositories/finance.ts
+- src/lib/repositories/monthly-close.ts
+- src/app/actions/monthly-close.ts
+- src/app/(app)/assets/page.tsx
+- src/app/(app)/monthly-close/page.tsx
+- tests if you add focused coverage
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 56 result if you commit successfully
+
+Context:
+- Task 1-7 are complete. Use existing auth, Supabase clients, AppShell, SummaryCard, domain format/monthly-close/insights modules, and transaction repository patterns.
+- Existing placeholder assets/monthly-close pages should be replaced with real data-backed screens.
+- Keep the implementation conservative and aligned with the current UI style.
+- Vercel/Supabase are the target deployment stack.
+
+Required implementation:
+1. Extend src/lib/repositories/finance.ts:
+   - add getAssetsData(supabase, householdId)
+   - add getMonthlyCloseData(supabase, householdId, month)
+   - include a nextMonth(month) helper or equivalent robust month boundary logic
+   - fetch active accounts, month transactions, budgets, current snapshot, previous snapshot, saved close
+   - throw on Supabase errors
+2. Create src/lib/repositories/monthly-close.ts:
+   - upsertMonthlyClose(supabase, householdId, metrics, insights)
+   - write monthly_closes fields from domain metrics and insight_items
+   - use onConflict household_id,month
+3. Create src/app/actions/monthly-close.ts:
+   - server action regenerateMonthlyClose(formData)
+   - requireUser()
+   - parse month from form data and use getMonthlyCloseData()
+   - map database rows into calculateMonthlyClose input
+   - generateInsights(metrics), upsertMonthlyClose(), revalidatePath('/monthly-close')
+   - basic month validation is welcome if small
+4. Replace src/app/(app)/assets/page.tsx:
+   - requireUser()
+   - getAssetsData()
+   - summary cards for assets, liabilities, net worth
+   - account list with type and balance
+5. Replace src/app/(app)/monthly-close/page.tsx:
+   - requireUser()
+   - choose month from searchParams or current month first day
+   - getMonthlyCloseData()
+   - show summary cards from savedClose, empty-state values if absent
+   - form to regenerate monthly close
+   - insights list from savedClose.insight_items with empty state
+   - keep responsive layout compact and consistent with app shell
+
+Verification:
+- Run npm run test.
+- Run npm exec tsc -- --noEmit.
+- Run next build with placeholder env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- feat: add assets and monthly close
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 53 - Task 7 Final Code Quality Re-Review
 
 - Agent: `019e711e-9a04-7020-ba48-75c591f817b9` / McClintock
