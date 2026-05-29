@@ -6,25 +6,30 @@ import { usePathname } from "next/navigation";
 import { BarChart3, Home, Landmark, Settings } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import clsx from "clsx";
+import type { AppRole } from "@/lib/auth/require-user";
 
 type NavItem = {
   label: string;
   href: Route;
   icon: LucideIcon;
+  adminOnly?: boolean;
 };
 
 const navigation: NavItem[] = [
   { label: "Today", href: "/today", icon: Home },
   { label: "Close", href: "/monthly-close", icon: BarChart3 },
   { label: "Assets", href: "/assets", icon: Landmark },
-  { label: "Settings", href: "/settings", icon: Settings }
+  { label: "Settings", href: "/settings", icon: Settings, adminOnly: true }
 ];
 
 type AppShellProps = {
   children: React.ReactNode;
+  role: AppRole;
 };
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, role }: AppShellProps) {
+  const visibleNavigation = navigation.filter((item) => !item.adminOnly || role === "admin");
+
   return (
     <div className="min-h-screen bg-mist text-ink">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-line bg-white px-4 py-5 md:flex md:flex-col">
@@ -33,7 +38,7 @@ export function AppShell({ children }: AppShellProps) {
           <span className="text-sm text-ink/60">Shared household view</span>
         </Link>
         <nav aria-label="Primary" className="flex flex-1 flex-col gap-1">
-          {navigation.map((item) => (
+          {visibleNavigation.map((item) => (
             <NavLink key={item.href} item={item} />
           ))}
         </nav>
@@ -45,9 +50,12 @@ export function AppShell({ children }: AppShellProps) {
 
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-20 grid h-[calc(5rem+env(safe-area-inset-bottom))] grid-cols-4 border-t border-line bg-white/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_24px_rgba(23,33,31,0.08)] backdrop-blur md:hidden"
+        className={clsx(
+          "fixed inset-x-0 bottom-0 z-20 grid h-[calc(5rem+env(safe-area-inset-bottom))] border-t border-line bg-white/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_24px_rgba(23,33,31,0.08)] backdrop-blur md:hidden",
+          role === "admin" ? "grid-cols-4" : "grid-cols-3"
+        )}
       >
-        {navigation.map((item) => (
+        {visibleNavigation.map((item) => (
           <NavLink key={item.href} item={item} mobile />
         ))}
       </nav>

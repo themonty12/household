@@ -238,9 +238,11 @@ with check (household_id = current_household_id() and current_app_role() = 'admi
 
 -- First-admin setup example:
 -- Replace AUTH_USER_UUID with the UUID from the first Supabase Auth user.
--- insert into households (name)
--- values ('Example Household')
--- returning id;
---
+-- with new_household as (
+--   insert into households (name)
+--   values ('Example Household')
+--   returning id
+-- )
 -- insert into profiles (id, household_id, display_name, role, status)
--- values ('AUTH_USER_UUID'::uuid, 'HOUSEHOLD_UUID'::uuid, 'Admin', 'admin', 'active');
+-- select 'AUTH_USER_UUID'::uuid, id, 'Admin', 'admin', 'active'
+-- from new_household;
