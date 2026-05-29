@@ -280,6 +280,124 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 69 - Task 10 Spec Review
+
+- Agent: `019e7236-73a1-70f2-9321-c43e5a1336f9` / Kuhn
+- Type: spec compliance reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are reviewing Task 10 spec compliance.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 10 required:
+- Create docs/deployment.md.
+- Include Supabase setup steps:
+  - create project
+  - disable public sign-up / invite-only access
+  - apply migrations
+  - create first Auth user
+  - insert household/admin profile using SQL note in supabase/migrations/0001_initial_schema.sql
+  - confirm RLS on finance tables
+- Include Vercel setup:
+  - required env vars NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_APP_URL
+  - repository root deployment and npm run build command
+- Include verification:
+  - before deployment: npm run test, npm run build, npm run test:e2e
+  - after deployment: login flow, /today, /assets, /monthly-close, /settings, sample account/category/transaction/monthly close flow
+  - note /settings and monthly close regenerate are admin-only
+- The implementer reported npm run test, placeholder-env next build, npm run test:e2e, and git diff --check passed.
+
+Implementation commit:
+- d8b5f80 docs: add deployment checklist
+
+Review only spec compliance. Do not edit files. Report spec compliant or exact missing/extra issues with file:line references.
+```
+
+## Prompt 70 - Task 10 Code Quality Review
+
+- Agent: `019e7237-991e-7561-9262-27a322a039e0` / Leibniz
+- Type: code quality reviewer
+- Result: not ready; requested deployment doc operational fixes for Supabase CLI steps, service role safety, Windows build command, and member verification
+
+Message content:
+
+```text
+You are a Senior Code Reviewer reviewing Task 10 code/document quality.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 10 added docs/deployment.md and reported final verification. Spec compliance passed.
+
+Review current docs/deployment.md and commit d8b5f80 for:
+- Accuracy and usefulness of Supabase setup instructions.
+- Accuracy and usefulness of Vercel env/build instructions.
+- Whether verification commands and post-deploy checks are actionable.
+- Any misleading, unsafe, stale, or missing operational guidance for this MVP.
+- Any formatting or readability issues.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 71 - Task 10 Fix Request: Deployment Operations Detail
+
+- Agent: `019e723a-72b9-78a0-8515-9ddbfb4e3a05` / Popper
+- Type: follow-up implementation instruction
+- Result: completed in `ed6a792 docs: harden deployment checklist`
+
+Message content:
+
+```text
+Please fix Task 10 deployment documentation review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others. Touch only:
+- docs/deployment.md
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 71 result if you commit successfully
+
+Required fixes:
+1. Make Supabase migration setup actionable:
+   - include Supabase CLI flow such as supabase login, supabase link --project-ref <project-ref>, supabase db push, and supabase migration list
+   - mention Dashboard SQL Editor fallback if CLI is unavailable
+2. Add service role key safety guidance:
+   - keep SUPABASE_SERVICE_ROLE_KEY server-only
+   - never prefix it with NEXT_PUBLIC_
+   - do not expose it to untrusted preview deployments
+   - prefer a separate Supabase project/key for previews/testing
+3. Add Windows/PowerShell-friendly local build guidance:
+   - either recommend .env.local for local verification or include a PowerShell env example
+   - avoid POSIX-only inline env syntax as the only example
+4. Add non-admin/member verification setup:
+   - create a second Auth user/profile with role member
+   - verify /settings redirects/hides nav and admin-only monthly-close regenerate is unavailable
+5. Clarify e2e scope:
+   - npm run test:e2e is currently a login smoke test, not a full seeded app flow
+6. Add small practical details if concise:
+   - Auth Dashboard user creation, confirmed email/password, record UUID
+   - Supabase advisor check after migrations
+   - key locations in Supabase/Vercel settings
+   - brief rollback note
+
+Verification:
+- Run git diff --check.
+- If cheap, run markdown/content sanity checks manually.
+
+Commit with message:
+- docs: harden deployment checklist
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 67 - Task 9 Final Code Quality Re-Review
 
 - Agent: `019e7230-abf8-7a21-8602-6dc70fa836db` / Peirce
