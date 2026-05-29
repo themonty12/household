@@ -2,21 +2,27 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireUser } from "@/lib/auth/require-user";
+import { requireAdmin } from "@/lib/auth/require-user";
 import { generateInsights } from "@/lib/domain/insights";
 import { calculateMonthlyClose } from "@/lib/domain/monthly-close";
 import { getMonthlyCloseData, normalizeMonth } from "@/lib/repositories/finance";
 import { upsertMonthlyClose } from "@/lib/repositories/monthly-close";
 
 export async function regenerateMonthlyClose(formData: FormData) {
-  const { profile, supabase } = await requireUser();
+  const { profile, supabase } = await requireAdmin();
   const rawMonth = formData.get("month");
 
   if (typeof rawMonth !== "string") {
-    throw new Error("Month is required.");
+    return;
   }
 
-  const month = normalizeMonth(rawMonth);
+  let month: string;
+  try {
+    month = normalizeMonth(rawMonth);
+  } catch {
+    return;
+  }
+
   const data = await getMonthlyCloseData(supabase, profile.household_id, month);
   const metrics = calculateMonthlyClose({
     month,

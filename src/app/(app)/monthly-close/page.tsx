@@ -20,6 +20,14 @@ function monthInputValue(month: string) {
   return month.slice(0, 7);
 }
 
+function resolveMonth(month?: string) {
+  try {
+    return normalizeMonth(month ?? currentMonthStart());
+  } catch {
+    return currentMonthStart();
+  }
+}
+
 function insightTone(severity: InsightItem["severity"]) {
   if (severity === "positive") {
     return "border-leaf/30 bg-leaf/10 text-leaf";
@@ -36,8 +44,9 @@ export default async function MonthlyClosePage({
   searchParams
 }: MonthlyClosePageProps) {
   const params = await searchParams;
-  const month = normalizeMonth(params?.month ?? currentMonthStart());
+  const month = resolveMonth(params?.month);
   const { profile, supabase } = await requireUser();
+  const canRegenerate = profile.role === "admin";
   const { transactions, budgets, snapshot, savedClose } = await getMonthlyCloseData(
     supabase,
     profile.household_id,
@@ -113,15 +122,17 @@ export default async function MonthlyClosePage({
                   : "No monthly close saved yet."}
               </p>
             </div>
-            <form action={regenerateMonthlyClose}>
-              <input name="month" type="hidden" value={month} />
-              <button
-                className="h-10 rounded-md bg-ink px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ink/85"
-                type="submit"
-              >
-                Regenerate
-              </button>
-            </form>
+            {canRegenerate ? (
+              <form action={regenerateMonthlyClose}>
+                <input name="month" type="hidden" value={month} />
+                <button
+                  className="h-10 rounded-md bg-ink px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ink/85"
+                  type="submit"
+                >
+                  Regenerate
+                </button>
+              </form>
+            ) : null}
           </div>
 
           <dl className="grid gap-3 sm:grid-cols-3">

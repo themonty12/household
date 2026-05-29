@@ -64,7 +64,7 @@ describe("monthly close repositories", () => {
         transfer_total: 750,
         budget_variance: 200,
         savings_rate: 0.36,
-        fixed_cost_ratio: 0.42,
+        fixed_cost_ratio: null,
         net_worth_change: 1200,
         insight_items: insights
       },

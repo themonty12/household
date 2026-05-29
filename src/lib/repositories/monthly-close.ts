@@ -17,7 +17,7 @@ export async function upsertMonthlyClose(
       transfer_total: metrics.transferTotal,
       budget_variance: metrics.budgetVariance,
       savings_rate: metrics.savingsRate,
-      fixed_cost_ratio: metrics.fixedCostRatio,
+      fixed_cost_ratio: null,
       net_worth_change: metrics.netWorthChange,
       insight_items: insights,
       generated_at: new Date().toISOString()
