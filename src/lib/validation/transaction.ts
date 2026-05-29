@@ -40,6 +40,14 @@ export const transactionSchema = z
         });
       }
 
+      if (transaction.categoryId) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Transfer transactions cannot include a category.",
+          path: ["categoryId"]
+        });
+      }
+
       return;
     }
 
@@ -48,6 +56,14 @@ export const transactionSchema = z
         code: z.ZodIssueCode.custom,
         message: "Category is required for non-transfer transactions.",
         path: ["categoryId"]
+      });
+    }
+
+    if (transaction.toAccountId) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Only transfer transactions can include a destination account.",
+        path: ["toAccountId"]
       });
     }
   });

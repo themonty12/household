@@ -247,7 +247,7 @@ Report spec compliant or exact issues with file:line references.
 
 - Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
 - Type: follow-up implementation instruction
-- Result: completed in `fix: add today account snapshot`
+- Result: completed in `7b17c95 fix: add today account snapshot`
 
 Message content:
 
@@ -276,6 +276,114 @@ Verification:
 
 Commit with message:
 - fix: add today account snapshot
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
+## Prompt 50 - Task 7 Final Spec Re-Review
+
+- Agent: `019e7115-a6b7-72e0-85a6-8fe0bf89569e` / Jason
+- Type: spec compliance re-reviewer
+- Result: spec compliant
+
+Message content:
+
+```text
+You are doing the final Task 7 spec compliance re-review after the account snapshot fix.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Original Task 7 required:
+- src/lib/validation/transaction.ts with transactionSchema and tests for positive expense, transfer missing destination rejection, and adjustment missing category rejection.
+- src/lib/repositories/finance.ts with getTodayData fetching active accounts, active categories, recent posted transactions and throwing on errors.
+- src/app/actions/transactions.ts with createTransaction server action using requireUser, transactionSchema, insert into transactions, transfer/non-transfer column handling, revalidate /today and /monthly-close.
+- src/components/forms/transaction-form.tsx with amount/date/type/account/category/memo fields and action createTransaction.
+- src/app/(app)/today/page.tsx using getTodayData, TransactionForm, summary cards, recent transactions list, and account snapshot list.
+
+Fix commits:
+- ded3b48 feat: add transaction entry
+- 84d3584 fix: harden transaction entry flow
+- 7b17c95 fix: add today account snapshot
+
+Verify all Task 7 requirements are now met, especially the account snapshot list. Report spec compliant or exact issues with file:line references.
+```
+
+## Prompt 51 - Task 7 Final Code Quality Review
+
+- Agent: `019e7117-5796-77a3-b406-20c6f9ca6b33` / Mill
+- Type: code quality reviewer
+- Result: not ready; requested validation forbidden-field checks, same-account transfer UX, local date default, snapshot divider polish
+
+Message content:
+
+```text
+You are a Senior Code Reviewer doing the final Task 7 code quality review.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Task 7 added transaction validation, transaction create action, finance repository, TransactionForm, and real Today screen. Spec compliance passed after fixes.
+
+Review current code and commit range 27f0af8..7b17c95. Focus on:
+- Validation alignment with DB constraints, including same-account transfer, transfer destination/category behavior, and adjustment category behavior.
+- Server action security and RLS assumptions.
+- Supabase query relation aliases and runtime correctness.
+- React/Next App Router conventions, server/client component boundaries, and form behavior.
+- Responsive UI quality for the Today screen and transaction form.
+- Test adequacy for the changed validation/domain behavior.
+- Any regressions from the account snapshot fix.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 52 - Task 7 Fix Request: Validation And Form Polish
+
+- Agent: `019e7103-5837-73b0-a8e7-fb4983650fb5` / Boyle
+- Type: follow-up implementation instruction
+- Result: completed in `fix: align transaction validation and form defaults`
+
+Message content:
+
+```text
+Please fix the remaining Task 7 code quality review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Do not revert any changes. You are not alone in the codebase. Touch only:
+- src/lib/validation/transaction.ts
+- tests/validation/transaction.test.ts
+- src/components/forms/transaction-form.tsx
+- src/app/(app)/today/page.tsx
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 52 result if you commit successfully
+
+Required fixes:
+1. Make transactionSchema reject DB-invalid extra fields:
+   - transfers must reject categoryId
+   - income/expense/adjustment must reject toAccountId
+   - keep existing same-account transfer and required category/destination behavior
+2. Add validation tests for:
+   - transfer with category rejection
+   - non-transfer with destination rejection
+3. Improve TransactionForm UX:
+   - derive default date from the user's local date instead of toISOString UTC slicing
+   - prevent selecting the same account as transfer destination, preferably by tracking source account and filtering/disabling the matching destination option
+   - keep the fix compact; structured server action state is optional for a later task unless easy
+4. Polish Today account snapshot layout:
+   - avoid awkward wrapping dividers; use gap/bordered items or a simple divided list
+
+Verification:
+- Run validation/domain tests.
+- Run type check.
+- Run next build with required env vars if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: align transaction validation and form defaults
 
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```

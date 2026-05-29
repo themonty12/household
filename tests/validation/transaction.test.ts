@@ -55,6 +55,34 @@ describe("transactionSchema", () => {
     expect(transaction.categoryId).toBeUndefined();
   });
 
+  it("rejects transfer with category", () => {
+    const result = transactionSchema.safeParse({
+      date: "2026-05-29",
+      type: "transfer",
+      amount: "10000",
+      accountId: "checking",
+      toAccountId: "savings",
+      categoryId: "groceries"
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((issue) => issue.path.includes("categoryId"))).toBe(true);
+  });
+
+  it("rejects non-transfer with destination account", () => {
+    const result = transactionSchema.safeParse({
+      date: "2026-05-29",
+      type: "expense",
+      amount: "10000",
+      accountId: "checking",
+      toAccountId: "savings",
+      categoryId: "groceries"
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.some((issue) => issue.path.includes("toAccountId"))).toBe(true);
+  });
+
   it("rejects adjustment without category", () => {
     const result = transactionSchema.safeParse({
       date: "2026-05-29",

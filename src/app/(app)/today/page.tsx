@@ -49,13 +49,13 @@ export default async function TodayPage() {
           <span className="text-sm text-ink/60">{accounts.length} active</span>
         </div>
 
-        <div className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
+        <div className="rounded-md border border-line bg-white p-3 shadow-sm">
           {accounts.length === 0 ? (
-            <p className="p-4 text-sm text-ink/65">No active accounts yet.</p>
+            <p className="p-1 text-sm text-ink/65">No active accounts yet.</p>
           ) : (
-            <ul className="grid divide-y divide-line sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {accounts.map((account) => (
-                <li key={account.id} className="min-w-0 p-4">
+                <li key={account.id} className="min-w-0 rounded-md border border-line p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-ink">{account.name}</p>

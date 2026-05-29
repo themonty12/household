@@ -20,11 +20,18 @@ const transactionTypes = [
 type TransactionType = (typeof transactionTypes)[number]["value"];
 
 function todayDate() {
-  return new Date().toISOString().slice(0, 10);
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 export function TransactionForm({ accounts, categories }: TransactionFormProps) {
   const [transactionType, setTransactionType] = useState<TransactionType>("expense");
+  const [accountId, setAccountId] = useState("");
+  const [toAccountId, setToAccountId] = useState("");
   const isTransfer = transactionType === "transfer";
 
   return (
@@ -82,6 +89,15 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           Account
           <select
             name="accountId"
+            value={accountId}
+            onChange={(event) => {
+              const nextAccountId = event.target.value;
+              setAccountId(nextAccountId);
+
+              if (nextAccountId === toAccountId) {
+                setToAccountId("");
+              }
+            }}
             required
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
           >
@@ -99,12 +115,14 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             To account
             <select
               name="toAccountId"
+              value={toAccountId}
+              onChange={(event) => setToAccountId(event.target.value)}
               required
               className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
             >
               <option value="">Choose destination</option>
               {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
+                <option key={account.id} value={account.id} disabled={account.id === accountId}>
                   {account.name}
                 </option>
               ))}
