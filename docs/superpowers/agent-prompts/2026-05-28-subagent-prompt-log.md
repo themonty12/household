@@ -280,6 +280,41 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 72 - Task 10 Code Quality Re-Review
+
+- Agent: `019e723d-9f78-7982-9e1c-cc309e1fb2fb` / Carver
+- Type: code quality re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are doing the Task 10 deployment documentation quality re-review after fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous documentation review found:
+1. Supabase migration setup was too vague.
+2. SUPABASE_SERVICE_ROLE_KEY lacked safety guidance.
+3. Local placeholder build guidance used POSIX-only env syntax.
+4. Non-admin/member verification setup was missing.
+5. e2e scope was overstated.
+6. Practical details for Auth user creation, advisors, key locations, and rollback would help.
+
+Fix commit:
+- ed6a792 docs: harden deployment checklist
+
+Review current docs/deployment.md and relevant range d8b5f80..ed6a792. Verify previous issues are resolved without introducing misleading or unsafe guidance.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
 ## Prompt 69 - Task 10 Spec Review
 
 - Agent: `019e7236-73a1-70f2-9321-c43e5a1336f9` / Kuhn
