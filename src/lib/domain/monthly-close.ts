@@ -47,6 +47,7 @@ export function calculateMonthlyClose(
   }
 
   const fixedCategories = new Set(input.fixedCategoryIds ?? []);
+  const hasFixedCategoryMetadata = fixedCategories.size > 0;
   const fixedExpenses = Object.entries(categoryTotals).reduce(
     (total, [categoryId, amount]) =>
       fixedCategories.has(categoryId) ? total + amount : total,
@@ -75,7 +76,9 @@ export function calculateMonthlyClose(
         ? roundToFourDecimals((incomeTotal - expenseTotal) / incomeTotal)
         : null,
     fixedCostRatio:
-      incomeTotal > 0 ? roundToFourDecimals(fixedExpenses / incomeTotal) : null,
+      hasFixedCategoryMetadata && incomeTotal > 0
+        ? roundToFourDecimals(fixedExpenses / incomeTotal)
+        : null,
     netWorthChange:
       input.snapshot && input.previousSnapshot
         ? input.snapshot.netWorth - input.previousSnapshot.netWorth

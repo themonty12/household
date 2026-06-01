@@ -33,7 +33,23 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
   const [date, setDate] = useState("");
   const [accountId, setAccountId] = useState("");
   const [toAccountId, setToAccountId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const isTransfer = transactionType === "transfer";
+  const filteredCategories = categories.filter((category) => {
+    if (transactionType === "income") {
+      return category.type === "income";
+    }
+
+    if (transactionType === "expense") {
+      return category.type === "expense";
+    }
+
+    if (transactionType === "adjustment") {
+      return category.type === "income" || category.type === "expense";
+    }
+
+    return false;
+  });
 
   useEffect(() => {
     setDate(todayDate());
@@ -79,7 +95,11 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           <select
             name="type"
             value={transactionType}
-            onChange={(event) => setTransactionType(event.target.value as TransactionType)}
+            onChange={(event) => {
+              setTransactionType(event.target.value as TransactionType);
+              setCategoryId("");
+              setToAccountId("");
+            }}
             required
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
           >
@@ -139,11 +159,13 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             Category
             <select
               name="categoryId"
+              value={categoryId}
+              onChange={(event) => setCategoryId(event.target.value)}
               required
               className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
             >
               <option value="">Choose category</option>
-              {categories.map((category) => (
+              {filteredCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>

@@ -315,6 +315,116 @@ Use standard review output:
 Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
 ```
 
+## Prompt 73 - Final Whole-Branch Code Review
+
+- Agent: `019e723f-ef88-7aa1-8a87-bda36725a037` / Halley
+- Type: final code reviewer
+- Result: not ready; requested Supabase SSR session refresh middleware, category type integrity, fixed ratio cleanup, deployment checklist correction, and service role env cleanup
+
+Message content:
+
+```text
+You are doing the final whole-branch code review for the Household Finance MVP before completion.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Scope:
+- Branch: codex/household-finance-mvp
+- Review all implementation work from scaffold through deployment docs.
+- Base context is the implementation plan at docs/superpowers/plans/2026-05-27-household-finance-mvp.md.
+- Important commits include Supabase schema/RLS, Supabase clients/auth, monthly-close domain logic, app shell, login, transaction Today flow, assets/monthly-close screens, admin settings, and deployment docs.
+
+Focus on integration risks:
+- Auth and RLS alignment across Supabase schema, requireUser/requireAdmin, pages, and server actions.
+- Database constraints vs Zod validation/action payloads.
+- Monthly close calculation/storage/query correctness.
+- Responsive navigation and route access by role.
+- Vercel/Supabase deployment readiness and env handling.
+- Test/e2e/build coverage and any meaningful missing blockers.
+- Any regression, security issue, or operational issue that should block completion.
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
+## Prompt 74 - Final Fix Request: SSR Auth And Data Integrity
+
+- Agent: `019e7245-ac27-7160-8cf8-acb4b632a1dd` / Harvey
+- Type: follow-up implementation instruction
+- Result: original agent was shut down after no response; coordinator completed fixes and verification before committing
+
+Message content:
+
+```text
+Please fix the final whole-branch review issues only.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+You are not alone in the codebase. Do not revert edits made by others.
+
+Touch only files needed for these fixes, expected set:
+- middleware.ts or proxy.ts, depending on what builds with this Next.js version
+- src/lib/supabase/middleware.ts or src/lib/supabase/proxy.ts if you split the helper
+- src/app/actions/transactions.ts
+- src/components/forms/transaction-form.tsx
+- src/lib/repositories/finance.ts if TodayCategory typing needs narrowing
+- tests/validation/transaction.test.ts only if useful
+- src/lib/domain/monthly-close.ts and tests/domain/monthly-close.test.ts if you choose to make unsupported fixedCostRatio null at the calculation boundary
+- src/lib/repositories/monthly-close.ts and tests/repositories/monthly-close.test.ts if needed
+- src/lib/env.ts
+- .env.example
+- docs/deployment.md
+- docs/superpowers/agent-prompts/2026-05-28-subagent-prompt-log.md, only to update Prompt 74 result if you commit successfully
+
+Context:
+- Supabase docs for Next.js SSR say Server Components cannot set cookies, and a Proxy/middleware should refresh auth tokens and write refreshed cookies to both the request and response. The docs currently call this `proxy.ts`, but use whichever Next.js file convention works in this repo.
+- Current server.ts already comments that middleware refresh handles Server Component cookie write failures.
+
+Required fixes:
+1. Add Supabase SSR session refresh middleware/proxy:
+   - Use createServerClient from @supabase/ssr.
+   - Read cookies from NextRequest.
+   - When cookies are set, update request cookies and response cookies.
+   - Call a validating auth method (`getClaims()` if available in installed supabase-js typings; otherwise use `getUser()`).
+   - Add a matcher excluding static assets and common image files.
+   - Do not add route authorization redirects in middleware unless necessary; requireUser/requireAdmin remain page/action authorization boundaries.
+2. Enforce category type integrity for transaction creation:
+   - Form category options should be filtered by transaction type:
+     income -> income categories
+     expense -> expense categories
+     adjustment -> income and expense categories, not transfer
+     transfer -> no category
+   - Server action must verify the selected category belongs to the household and has the allowed type for the transaction type before insert.
+   - Keep existing transfer/no-category and same-account behavior.
+3. Clean up fixedCostRatio semantics:
+   - Do not keep an internal metric that implies 0 when no fixed category metadata exists.
+   - Prefer making calculateMonthlyClose return null when fixedCategoryIds is missing/empty, and keep persistence aligned with metrics.fixedCostRatio.
+   - Update tests accordingly without breaking existing meaningful metrics.
+4. Deployment checklist correction:
+   - Do not tell operators to create accounts/categories in `/settings`; that UI is setup guidance only.
+   - Tell them to seed admin-managed accounts/categories/budgets via Supabase Dashboard/SQL for this MVP.
+5. Service role env cleanup:
+   - If no code uses SUPABASE_SERVICE_ROLE_KEY, remove it from required env validation, .env.example, and deployment docs.
+   - Keep server-only safety guidance only if the key remains documented for a future/manual operation; do not make it required.
+
+Verification:
+- Run npm run test.
+- Run npm exec tsc -- --noEmit.
+- Run next build with placeholder env vars.
+- Run npm run test:e2e if practical.
+- Run git diff --check.
+
+Commit with message:
+- fix: harden auth refresh and transaction integrity
+
+Report Status, files changed, verification results, commit SHA, and concerns.
+```
+
 ## Prompt 69 - Task 10 Spec Review
 
 - Agent: `019e7236-73a1-70f2-9321-c43e5a1336f9` / Kuhn

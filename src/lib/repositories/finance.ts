@@ -11,7 +11,7 @@ export type TodayAccount = {
 export type TodayCategory = {
   id: string;
   name: string;
-  type: string;
+  type: "income" | "expense" | "transfer";
 };
 
 export type TodayRelationName = { name: string } | { name: string }[] | null;

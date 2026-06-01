@@ -19,9 +19,10 @@ Use this checklist for the Household Finance MVP production setup on Supabase an
 4. In Dashboard > Authentication > Users, create the first user with a confirmed email and password. Record the Auth user UUID.
 5. Insert the initial household and admin profile using the first-admin SQL note at the end of `supabase/migrations/0001_initial_schema.sql`. Replace `AUTH_USER_UUID` with the UUID from the Auth user created in the previous step.
 6. Create a second Auth user and profile with `role = 'member'` in the same household so non-admin behavior can be verified after deployment.
-7. Confirm row level security is enabled on the finance tables: `households`, `profiles`, `accounts`, `categories`, `transactions`, `budgets`, `monthly_snapshots`, and `monthly_closes`.
-8. Confirm write policies match the MVP roles: account/category/budget/monthly close administration is admin-only, while household members can read household data and create their own transactions.
-9. Run the Supabase security and performance advisors after migrations from Dashboard > Database > Advisors and resolve any deployment-blocking findings.
+7. Seed the admin-managed accounts, income and expense categories, and monthly budgets through Supabase Dashboard > Table Editor or Dashboard > SQL Editor. The `/settings` page is setup guidance for this MVP, not CRUD.
+8. Confirm row level security is enabled on the finance tables: `households`, `profiles`, `accounts`, `categories`, `transactions`, `budgets`, `monthly_snapshots`, and `monthly_closes`.
+9. Confirm write policies match the MVP roles: account/category/budget/monthly close administration is admin-only, while household members can read household data and create their own transactions.
+10. Run the Supabase security and performance advisors after migrations from Dashboard > Database > Advisors and resolve any deployment-blocking findings.
 
 ## Vercel
 
@@ -30,15 +31,10 @@ Use this checklist for the Household Finance MVP production setup on Supabase an
 3. Add these environment variables for Production and any trusted environment used for testing:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
    - `NEXT_PUBLIC_APP_URL`
 4. Set `NEXT_PUBLIC_APP_URL` to the deployed app URL for the environment, including the protocol.
 5. Copy Supabase values from Dashboard > Project Settings > API. Add them in Vercel > Project Settings > Environment Variables.
-6. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only:
-   - never prefix it with `NEXT_PUBLIC_`
-   - do not expose it to untrusted preview deployments
-   - prefer a separate Supabase project and key for preview or testing deployments
-7. Deploy after the Supabase project, migrations, Auth users, and profiles are ready.
+6. Deploy after the Supabase project, migrations, Auth users, profiles, accounts, categories, and budgets are ready.
 
 ## Before Deployment
 
@@ -57,7 +53,6 @@ For local build verification without production secrets, prefer a temporary `.en
 ```dotenv
 NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=test-anon-key
-SUPABASE_SERVICE_ROLE_KEY=test-service-role-key
 NEXT_PUBLIC_APP_URL=http://127.0.0.1:3100
 ```
 
@@ -72,7 +67,6 @@ PowerShell one-off equivalent:
 ```powershell
 $env:NEXT_PUBLIC_SUPABASE_URL='https://example.supabase.co'
 $env:NEXT_PUBLIC_SUPABASE_ANON_KEY='test-anon-key'
-$env:SUPABASE_SERVICE_ROLE_KEY='test-service-role-key'
 $env:NEXT_PUBLIC_APP_URL='http://127.0.0.1:3100'
 npm run build
 ```
@@ -87,8 +81,7 @@ npm run build
    - `/monthly-close`
    - `/settings`
 4. Run a sample flow:
-   - create an account in `/settings`
-   - create an income or expense category in `/settings`
+   - confirm the seeded accounts, categories, and budgets appear in the app
    - add a transaction in `/today`
    - verify balances and totals on `/assets`
    - generate or regenerate a monthly close in `/monthly-close`

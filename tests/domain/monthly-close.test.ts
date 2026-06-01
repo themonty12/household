@@ -65,6 +65,7 @@ describe("calculateMonthlyClose", () => {
     expect(metrics.transferTotal).toBe(1000);
     expect(metrics.budgetVariance).toBe(100);
     expect(metrics.savingsRate).toBe(0.6);
+    expect(metrics.fixedCostRatio).toBe(0.16);
     expect(metrics.netWorthChange).toBe(1200);
     expect(metrics.categoryTotals.food).toBe(1200);
   });
@@ -96,5 +97,32 @@ describe("calculateMonthlyClose", () => {
     });
 
     expect(metrics.budgetVariance).toBe(250);
+  });
+
+  it("returns null fixed cost ratio when fixed category metadata is unavailable", () => {
+    const metrics = calculateMonthlyClose({
+      month: "2026-05",
+      transactions: [
+        {
+          id: "income-1",
+          date: "2026-05-01",
+          type: "income",
+          amount: 5000,
+          categoryId: "salary",
+          accountId: "checking"
+        },
+        {
+          id: "expense-1",
+          date: "2026-05-12",
+          type: "expense",
+          amount: 250,
+          categoryId: "medical",
+          accountId: "checking"
+        }
+      ],
+      budgets: []
+    });
+
+    expect(metrics.fixedCostRatio).toBeNull();
   });
 });

@@ -169,9 +169,47 @@ begin
 end;
 $$;
 
+create or replace function enforce_transaction_category_type()
+returns trigger
+language plpgsql
+as $$
+declare
+  selected_category_type category_type;
+begin
+  if new.type = 'transfer' then
+    return new;
+  end if;
+
+  select type
+  into selected_category_type
+  from categories
+  where id = new.category_id
+    and household_id = new.household_id
+    and status = 'active';
+
+  if selected_category_type is null then
+    raise exception 'transaction category must exist in the household and be active';
+  end if;
+
+  if new.type in ('income', 'expense') and selected_category_type::text <> new.type::text then
+    raise exception 'transaction category type must match transaction type';
+  end if;
+
+  if new.type = 'adjustment' and selected_category_type = 'transfer' then
+    raise exception 'adjustment transactions cannot use transfer categories';
+  end if;
+
+  return new;
+end;
+$$;
+
 create trigger transactions_touch_updated_at
 before update on transactions
 for each row execute function touch_updated_at();
+
+create trigger transactions_category_type_check
+before insert or update of household_id, type, category_id on transactions
+for each row execute function enforce_transaction_category_type();
 
 alter table households enable row level security;
 alter table profiles enable row level security;
