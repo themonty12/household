@@ -19,7 +19,7 @@ export async function createTransaction(formData: FormData) {
     const categoryId = transaction.categoryId;
 
     if (!categoryId) {
-      throw new Error("Category is required for non-transfer transactions.");
+      throw new Error("이체가 아닌 거래에는 카테고리가 필요합니다.");
     }
 
     const { data: category, error: categoryError } = await supabase
@@ -39,7 +39,7 @@ export async function createTransaction(formData: FormData) {
       !category ||
       !allowedCategoryTypes.includes((category as { type: CategoryType }).type)
     ) {
-      throw new Error("Selected category is not valid for this transaction type.");
+      throw new Error("선택한 카테고리는 이 거래 유형에 사용할 수 없습니다.");
     }
   }
 

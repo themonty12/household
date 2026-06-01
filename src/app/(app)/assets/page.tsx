@@ -1,13 +1,10 @@
 import { SummaryCard } from "@/components/summary-card";
 import { requireUser } from "@/lib/auth/require-user";
 import { formatWon } from "@/lib/domain/format";
+import { accountTypeLabel } from "@/lib/domain/labels";
 import { getAssetsData } from "@/lib/repositories/finance";
 
 const liabilityTypes = new Set(["card", "loan", "other_liability"]);
-
-function accountTypeLabel(type: string) {
-  return type.replaceAll("_", " ");
-}
 
 export default async function AssetsPage() {
   const { profile, supabase } = await requireUser();
@@ -24,27 +21,27 @@ export default async function AssetsPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-normal text-ink">Assets</h1>
+        <h1 className="text-2xl font-semibold tracking-normal text-ink">자산</h1>
         <p className="text-sm leading-6 text-ink/70">
-          Review active accounts and the household net worth position.
+          사용 중인 계좌와 우리집 순자산 상태를 확인합니다.
         </p>
       </div>
 
-      <section aria-label="Assets summary" className="grid gap-3 sm:grid-cols-3">
-        <SummaryCard label="Assets" value={formatWon(assets)} tone="positive" />
-        <SummaryCard label="Liabilities" value={formatWon(liabilities)} tone="warning" />
-        <SummaryCard label="Net worth" value={formatWon(netWorth)} />
+      <section aria-label="자산 요약" className="grid gap-3 sm:grid-cols-3">
+        <SummaryCard label="자산" value={formatWon(assets)} tone="positive" />
+        <SummaryCard label="부채" value={formatWon(liabilities)} tone="warning" />
+        <SummaryCard label="순자산" value={formatWon(netWorth)} />
       </section>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold tracking-normal text-ink">Accounts</h2>
-          <span className="text-sm text-ink/60">{accounts.length} active</span>
+          <h2 className="text-base font-semibold tracking-normal text-ink">계좌</h2>
+          <span className="text-sm text-ink/60">{accounts.length}개 사용 중</span>
         </div>
 
         <div className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
           {accounts.length === 0 ? (
-            <p className="p-4 text-sm text-ink/65">No active accounts yet.</p>
+            <p className="p-4 text-sm text-ink/65">아직 사용 중인 계좌가 없습니다.</p>
           ) : (
             <ul className="divide-y divide-line">
               {accounts.map((account) => {
@@ -63,7 +60,7 @@ export default async function AssetsPage() {
                         </p>
                         {!account.include_in_net_worth ? (
                           <span className="rounded-md border border-line px-2 py-0.5 text-xs text-ink/60">
-                            Excluded
+                            순자산 제외
                           </span>
                         ) : null}
                       </div>

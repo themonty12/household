@@ -93,6 +93,44 @@ export type MonthlyCloseData = {
   savedClose: SavedMonthlyClose | null;
 };
 
+export type SettingsAccount = {
+  id: string;
+  name: string;
+  type: string;
+  include_in_net_worth: boolean;
+  current_balance: number | string;
+  status: "active" | "archived";
+};
+
+export type SettingsCategory = {
+  id: string;
+  name: string;
+  type: "income" | "expense" | "transfer";
+  sort_order: number;
+  status: "active" | "archived";
+};
+
+export type SettingsBudget = {
+  id: string;
+  month: string;
+  category_id: string;
+  amount: number | string;
+};
+
+export type SettingsProfile = {
+  id: string;
+  display_name: string;
+  role: "admin" | "member";
+  status: "invited" | "active" | "disabled";
+};
+
+export type SettingsData = {
+  accounts: SettingsAccount[];
+  categories: SettingsCategory[];
+  budgets: SettingsBudget[];
+  profiles: SettingsProfile[];
+};
+
 export async function getTodayData(
   supabase: SupabaseClient,
   householdId: string
@@ -281,5 +319,63 @@ export async function getMonthlyCloseData(
     snapshot: (snapshotResult.data ?? null) as MonthlyCloseSnapshot | null,
     previousSnapshot: (previousSnapshotResult.data ?? null) as MonthlyCloseSnapshot | null,
     savedClose: (savedCloseResult.data ?? null) as SavedMonthlyClose | null
+  };
+}
+
+export async function getSettingsData(
+  supabase: SupabaseClient,
+  householdId: string,
+  month: string
+): Promise<SettingsData> {
+  const monthStart = normalizeMonth(month);
+  const [accountsResult, categoriesResult, budgetsResult, profilesResult] =
+    await Promise.all([
+      supabase
+        .from("accounts")
+        .select("id, name, type, include_in_net_worth, current_balance, status")
+        .eq("household_id", householdId)
+        .order("status", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("categories")
+        .select("id, name, type, sort_order, status")
+        .eq("household_id", householdId)
+        .order("status", { ascending: true })
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("budgets")
+        .select("id, month, category_id, amount")
+        .eq("household_id", householdId)
+        .eq("month", monthStart),
+      supabase
+        .from("profiles")
+        .select("id, display_name, role, status")
+        .eq("household_id", householdId)
+        .order("role", { ascending: true })
+        .order("display_name", { ascending: true })
+    ]);
+
+  if (accountsResult.error) {
+    throw accountsResult.error;
+  }
+
+  if (categoriesResult.error) {
+    throw categoriesResult.error;
+  }
+
+  if (budgetsResult.error) {
+    throw budgetsResult.error;
+  }
+
+  if (profilesResult.error) {
+    throw profilesResult.error;
+  }
+
+  return {
+    accounts: (accountsResult.data ?? []) as SettingsAccount[],
+    categories: (categoriesResult.data ?? []) as SettingsCategory[],
+    budgets: (budgetsResult.data ?? []) as SettingsBudget[],
+    profiles: (profilesResult.data ?? []) as SettingsProfile[]
   };
 }

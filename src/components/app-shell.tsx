@@ -16,10 +16,10 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { label: "Today", href: "/today", icon: Home },
-  { label: "Close", href: "/monthly-close", icon: BarChart3 },
-  { label: "Assets", href: "/assets", icon: Landmark },
-  { label: "Settings", href: "/settings", icon: Settings, adminOnly: true }
+  { label: "오늘", href: "/today", icon: Home },
+  { label: "월 결산", href: "/monthly-close", icon: BarChart3 },
+  { label: "자산", href: "/assets", icon: Landmark },
+  { label: "설정", href: "/settings", icon: Settings, adminOnly: true }
 ];
 
 type AppShellProps = {
@@ -34,10 +34,10 @@ export function AppShell({ children, role }: AppShellProps) {
     <div className="min-h-screen bg-mist text-ink">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-line bg-white px-4 py-5 md:flex md:flex-col">
         <Link href="/today" className="mb-8 flex flex-col gap-1 px-2">
-          <span className="text-lg font-semibold tracking-normal">Household Finance</span>
-          <span className="text-sm text-ink/60">Shared household view</span>
+          <span className="text-lg font-semibold tracking-normal">우리집 가계부</span>
+          <span className="text-sm text-ink/60">가족 자산과 지출 관리</span>
         </Link>
-        <nav aria-label="Primary" className="flex flex-1 flex-col gap-1">
+        <nav aria-label="주요 메뉴" className="flex flex-1 flex-col gap-1">
           {visibleNavigation.map((item) => (
             <NavLink key={item.href} item={item} />
           ))}
@@ -49,7 +49,7 @@ export function AppShell({ children, role }: AppShellProps) {
       </main>
 
       <nav
-        aria-label="Primary"
+        aria-label="주요 메뉴"
         className={clsx(
           "fixed inset-x-0 bottom-0 z-20 grid h-[calc(5rem+env(safe-area-inset-bottom))] border-t border-line bg-white/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_24px_rgba(23,33,31,0.08)] backdrop-blur md:hidden",
           role === "admin" ? "grid-cols-4" : "grid-cols-3"

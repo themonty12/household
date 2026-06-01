@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { createTransaction } from "@/app/actions/transactions";
+import { transactionTypeLabel } from "@/lib/domain/labels";
 import type { TodayAccount, TodayCategory } from "@/lib/repositories/finance";
 
 type TransactionFormProps = {
@@ -11,10 +12,10 @@ type TransactionFormProps = {
 };
 
 const transactionTypes = [
-  { value: "expense", label: "Expense" },
-  { value: "income", label: "Income" },
-  { value: "transfer", label: "Transfer" },
-  { value: "adjustment", label: "Adjustment" }
+  { value: "expense", label: transactionTypeLabel("expense") },
+  { value: "income", label: transactionTypeLabel("income") },
+  { value: "transfer", label: transactionTypeLabel("transfer") },
+  { value: "adjustment", label: transactionTypeLabel("adjustment") }
 ] as const;
 
 type TransactionType = (typeof transactionTypes)[number]["value"];
@@ -61,12 +62,12 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
       className="space-y-4 rounded-md border border-line bg-white p-4 shadow-sm"
     >
       <div className="flex flex-col gap-1">
-        <h2 className="text-base font-semibold tracking-normal text-ink">Add transaction</h2>
+        <h2 className="text-base font-semibold tracking-normal text-ink">거래 입력</h2>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          Amount
+          금액
           <input
             name="amount"
             inputMode="decimal"
@@ -79,7 +80,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         </label>
 
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          Date
+          날짜
           <input
             name="date"
             type="date"
@@ -91,7 +92,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         </label>
 
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          Type
+          유형
           <select
             name="type"
             value={transactionType}
@@ -112,7 +113,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         </label>
 
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-          Account
+          계좌
           <select
             name="accountId"
             value={accountId}
@@ -127,7 +128,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             required
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
           >
-            <option value="">Choose account</option>
+            <option value="">계좌 선택</option>
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
                 {account.name}
@@ -138,7 +139,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
 
         {isTransfer ? (
           <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-            To account
+            받을 계좌
             <select
               name="toAccountId"
               value={toAccountId}
@@ -146,7 +147,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               required
               className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
             >
-              <option value="">Choose destination</option>
+              <option value="">받을 계좌 선택</option>
               {accounts.map((account) => (
                 <option key={account.id} value={account.id} disabled={account.id === accountId}>
                   {account.name}
@@ -156,7 +157,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           </label>
         ) : (
           <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-            Category
+            카테고리
             <select
               name="categoryId"
               value={categoryId}
@@ -164,7 +165,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               required
               className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
             >
-              <option value="">Choose category</option>
+              <option value="">카테고리 선택</option>
               {filteredCategories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -175,12 +176,12 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         )}
 
         <label className="flex flex-col gap-1 text-sm font-medium text-ink/75 sm:col-span-2">
-          Memo
+          메모
           <input
             name="memo"
             maxLength={240}
             className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
-            placeholder="Optional note"
+            placeholder="선택 입력"
           />
         </label>
       </div>
@@ -190,7 +191,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           type="submit"
           className="h-10 rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90"
         >
-          Save
+          저장
         </button>
       </div>
     </form>

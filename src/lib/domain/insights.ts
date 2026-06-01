@@ -9,23 +9,23 @@ export function generateInsights(metrics: MonthlyCloseMetrics): InsightItem[] {
     if (budget !== undefined && actual > budget) {
       insights.push({
         severity: "warning",
-        title: "Budget overrun",
-        message: `${categoryId} spending is ${actual - budget} over budget.`,
+        title: "예산 초과",
+        message: `${categoryId} 지출이 예산보다 ${actual - budget}원 많습니다.`,
         metricRefs: [`categoryTotals.${categoryId}`, `budgetByCategory.${categoryId}`],
-        suggestedAction: "Review recent spending and adjust the category plan."
+        suggestedAction: "최근 지출 내역을 확인하고 카테고리 예산을 조정해 보세요."
       });
     }
 
     if (budget === undefined && actual > 0) {
       insights.push({
         severity: "info",
-        title: "Unbudgeted spending",
-        message: `${categoryId} spending has no budget for this month.`,
+        title: "예산 없는 지출",
+        message: `${categoryId} 지출에 이번 달 예산이 없습니다.`,
         metricRefs: [
           `categoryTotals.${categoryId}`,
           `budgetByCategory.${categoryId}`
         ],
-        suggestedAction: "Add a budget or recategorize the transaction."
+        suggestedAction: "예산을 추가하거나 거래 카테고리를 다시 확인해 보세요."
       });
     }
   }
@@ -33,50 +33,50 @@ export function generateInsights(metrics: MonthlyCloseMetrics): InsightItem[] {
   if (metrics.savingsRate !== null && metrics.savingsRate >= 0.3) {
     insights.push({
       severity: "positive",
-      title: "Strong savings rate",
-      message: "Savings rate is at least 30% for the month.",
+      title: "저축률 양호",
+      message: "이번 달 저축률이 30% 이상입니다.",
       metricRefs: ["savingsRate"],
-      suggestedAction: "Consider directing surplus toward priority goals."
+      suggestedAction: "남는 금액을 우선순위 목표에 배분해 보세요."
     });
   }
 
   if (metrics.fixedCostRatio !== null && metrics.fixedCostRatio >= 0.5) {
     insights.push({
       severity: "warning",
-      title: "Fixed costs are high",
-      message: "Fixed costs are at least 50% of income.",
+      title: "고정비 비중 높음",
+      message: "고정비가 수입의 50% 이상입니다.",
       metricRefs: ["fixedCostRatio"],
-      suggestedAction: "Review recurring bills and fixed commitments."
+      suggestedAction: "정기 결제와 고정 지출을 점검해 보세요."
     });
   }
 
   if (metrics.netWorthChange !== null && metrics.netWorthChange > 0) {
     insights.push({
       severity: "positive",
-      title: "Net worth increased",
-      message: "Net worth improved compared with the previous snapshot.",
+      title: "순자산 증가",
+      message: "이전 스냅샷보다 순자산이 늘었습니다.",
       metricRefs: ["netWorthChange"],
-      suggestedAction: "Keep the monthly close cadence going."
+      suggestedAction: "월 결산 리듬을 계속 유지해 보세요."
     });
   }
 
   if (metrics.missingBudget) {
     insights.push({
       severity: "info",
-      title: "Budgets missing",
-      message: "Add budgets to compare planned and actual spending.",
+      title: "예산 미설정",
+      message: "계획 대비 실제 지출을 비교하려면 예산이 필요합니다.",
       metricRefs: ["missingBudget"],
-      suggestedAction: "Create category budgets for the month."
+      suggestedAction: "이번 달 카테고리별 예산을 설정해 주세요."
     });
   }
 
   if (metrics.missingSnapshot) {
     insights.push({
       severity: "info",
-      title: "Snapshot missing",
-      message: "Add a monthly snapshot to calculate net worth movement.",
+      title: "스냅샷 없음",
+      message: "순자산 변화를 계산하려면 월별 스냅샷이 필요합니다.",
       metricRefs: ["missingSnapshot"],
-      suggestedAction: "Record assets, liabilities, and net worth."
+      suggestedAction: "자산, 부채, 순자산 스냅샷을 기록해 주세요."
     });
   }
 

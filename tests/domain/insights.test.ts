@@ -22,9 +22,9 @@ describe("generateInsights", () => {
 
     expect(insights.map((insight) => insight.title)).toEqual(
       expect.arrayContaining([
-        "Budget overrun",
-        "Strong savings rate",
-        "Net worth increased"
+        "예산 초과",
+        "저축률 양호",
+        "순자산 증가"
       ])
     );
   });
@@ -50,11 +50,11 @@ describe("generateInsights", () => {
     expect(insights).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          title: "Budgets missing",
+          title: "예산 미설정",
           metricRefs: ["missingBudget"]
         }),
         expect.objectContaining({
-          title: "Snapshot missing",
+          title: "스냅샷 없음",
           metricRefs: ["missingSnapshot"]
         })
       ])
@@ -80,7 +80,7 @@ describe("generateInsights", () => {
     expect(insights).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          title: "Unbudgeted spending",
+          title: "예산 없는 지출",
           metricRefs: ["categoryTotals.medical", "budgetByCategory.medical"]
         })
       ])

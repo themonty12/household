@@ -66,16 +66,16 @@ export default async function MonthlyClosePage({
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold tracking-normal text-ink">
-            Monthly Close
+            월 결산
           </h1>
           <p className="text-sm leading-6 text-ink/70">
-            Regenerate the household month-end summary after transactions, budgets, or snapshots change.
+            거래, 예산, 자산 스냅샷이 바뀐 뒤 월별 결산과 의견을 다시 생성합니다.
           </p>
         </div>
 
         <form action="/monthly-close" className="flex items-center gap-2">
           <input
-            aria-label="Month"
+            aria-label="월"
             className="h-10 rounded-md border border-line bg-white px-3 text-sm text-ink shadow-sm"
             defaultValue={monthInputValue(month)}
             name="month"
@@ -85,21 +85,21 @@ export default async function MonthlyClosePage({
             className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-paper"
             type="submit"
           >
-            View
+            조회
           </button>
         </form>
       </div>
 
-      <section aria-label="Monthly close summary" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard label="Income" value={formatWon(incomeTotal)} tone="positive" />
-        <SummaryCard label="Expenses" value={formatWon(expenseTotal)} tone="warning" />
+      <section aria-label="월 결산 요약" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard label="수입" value={formatWon(incomeTotal)} tone="positive" />
+        <SummaryCard label="지출" value={formatWon(expenseTotal)} tone="warning" />
         <SummaryCard
-          label="Budget variance"
+          label="예산 차이"
           value={formatWon(budgetVariance)}
           tone={budgetVariance > 0 ? "warning" : "neutral"}
         />
         <SummaryCard
-          label="Savings rate"
+          label="저축률"
           value={formatPercent(
             savedClose?.savings_rate === null || savedClose?.savings_rate === undefined
               ? null
@@ -114,12 +114,12 @@ export default async function MonthlyClosePage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold tracking-normal text-ink">
-                Close status
+                결산 상태
               </h2>
               <p className="mt-1 text-sm text-ink/65">
                 {savedClose
-                  ? `Generated ${new Date(savedClose.generated_at).toLocaleDateString()}`
-                  : "No monthly close saved yet."}
+                  ? `${new Date(savedClose.generated_at).toLocaleDateString()} 생성됨`
+                  : "아직 저장된 월 결산이 없습니다."}
               </p>
             </div>
             {canRegenerate ? (
@@ -129,7 +129,7 @@ export default async function MonthlyClosePage({
                   className="h-10 rounded-md bg-ink px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ink/85"
                   type="submit"
                 >
-                  Regenerate
+                  다시 생성
                 </button>
               </form>
             ) : null}
@@ -137,56 +137,56 @@ export default async function MonthlyClosePage({
 
           <dl className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-md border border-line p-3">
-              <dt className="text-xs uppercase tracking-normal text-ink/55">Transactions</dt>
+              <dt className="text-xs uppercase tracking-normal text-ink/55">거래</dt>
               <dd className="mt-2 text-xl font-semibold text-ink">{transactions.length}</dd>
             </div>
             <div className="rounded-md border border-line p-3">
-              <dt className="text-xs uppercase tracking-normal text-ink/55">Budgets</dt>
+              <dt className="text-xs uppercase tracking-normal text-ink/55">예산</dt>
               <dd className="mt-2 text-xl font-semibold text-ink">{budgets.length}</dd>
             </div>
             <div className="rounded-md border border-line p-3">
-              <dt className="text-xs uppercase tracking-normal text-ink/55">Net worth change</dt>
+              <dt className="text-xs uppercase tracking-normal text-ink/55">순자산 변화</dt>
               <dd className="mt-2 text-xl font-semibold text-ink">
-                {netWorthChange === null ? "N/A" : formatWon(netWorthChange)}
+                {netWorthChange === null ? "없음" : formatWon(netWorthChange)}
               </dd>
             </div>
           </dl>
         </div>
 
         <div className="rounded-md border border-line bg-white p-4 shadow-sm">
-          <h2 className="text-base font-semibold tracking-normal text-ink">Snapshot</h2>
+          <h2 className="text-base font-semibold tracking-normal text-ink">자산 스냅샷</h2>
           {snapshot ? (
             <dl className="mt-3 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-3">
-                <dt className="text-ink/65">Assets</dt>
+                <dt className="text-ink/65">자산</dt>
                 <dd className="font-semibold text-ink">{formatWon(Number(snapshot.total_assets))}</dd>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <dt className="text-ink/65">Liabilities</dt>
+                <dt className="text-ink/65">부채</dt>
                 <dd className="font-semibold text-ink">
                   {formatWon(Number(snapshot.total_liabilities))}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <dt className="text-ink/65">Net worth</dt>
+                <dt className="text-ink/65">순자산</dt>
                 <dd className="font-semibold text-ink">{formatWon(Number(snapshot.net_worth))}</dd>
               </div>
             </dl>
           ) : (
-            <p className="mt-3 text-sm text-ink/65">No snapshot for this month.</p>
+            <p className="mt-3 text-sm text-ink/65">이 월의 스냅샷이 없습니다.</p>
           )}
         </div>
       </section>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold tracking-normal text-ink">Insights</h2>
-          <span className="text-sm text-ink/60">{insights.length} saved</span>
+          <h2 className="text-base font-semibold tracking-normal text-ink">자동 의견</h2>
+          <span className="text-sm text-ink/60">{insights.length}개 저장됨</span>
         </div>
 
         {insights.length === 0 ? (
           <div className="rounded-md border border-line bg-white p-4 text-sm text-ink/65 shadow-sm">
-            Regenerate the close to save insights for this month.
+            이 월의 자동 의견을 저장하려면 결산을 다시 생성해 주세요.
           </div>
         ) : (
           <ul className="grid gap-3 lg:grid-cols-2">
