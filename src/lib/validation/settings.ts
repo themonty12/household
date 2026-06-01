@@ -55,6 +55,7 @@ export const categorySettingsSchema = z.object({
   id: optionalId,
   name: requiredName,
   type: categoryTypeSchema,
+  parentCategoryId: optionalId,
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   status: recordStatusSchema.default("active")
 });

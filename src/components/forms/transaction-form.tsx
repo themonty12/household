@@ -29,6 +29,14 @@ function todayDate() {
   return `${year}-${month}-${day}`;
 }
 
+function categoryOptionLabel(category: TodayCategory, categories: TodayCategory[]) {
+  const parent = category.parent_category_id
+    ? categories.find((candidate) => candidate.id === category.parent_category_id)
+    : undefined;
+
+  return parent ? `${parent.name} > ${category.name}` : category.name;
+}
+
 export function TransactionForm({ accounts, categories }: TransactionFormProps) {
   const [transactionType, setTransactionType] = useState<TransactionType>("expense");
   const [date, setDate] = useState("");
@@ -168,7 +176,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               <option value="">카테고리 선택</option>
               {filteredCategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name}
+                  {categoryOptionLabel(category, categories)}
                 </option>
               ))}
             </select>

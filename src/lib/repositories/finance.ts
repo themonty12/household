@@ -12,6 +12,7 @@ export type TodayCategory = {
   id: string;
   name: string;
   type: "income" | "expense" | "transfer";
+  parent_category_id: string | null;
 };
 
 export type TodayRelationName = { name: string } | { name: string }[] | null;
@@ -106,6 +107,7 @@ export type SettingsCategory = {
   id: string;
   name: string;
   type: "income" | "expense" | "transfer";
+  parent_category_id: string | null;
   sort_order: number;
   status: "active" | "archived";
 };
@@ -144,9 +146,10 @@ export async function getTodayData(
       .order("name", { ascending: true }),
     supabase
       .from("categories")
-      .select("id, name, type")
+      .select("id, name, type, parent_category_id")
       .eq("household_id", householdId)
       .eq("status", "active")
+      .order("parent_category_id", { ascending: true, nullsFirst: true })
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
     supabase
@@ -338,9 +341,10 @@ export async function getSettingsData(
         .order("name", { ascending: true }),
       supabase
         .from("categories")
-        .select("id, name, type, sort_order, status")
+        .select("id, name, type, parent_category_id, sort_order, status")
         .eq("household_id", householdId)
         .order("status", { ascending: true })
+        .order("parent_category_id", { ascending: true, nullsFirst: true })
         .order("sort_order", { ascending: true })
         .order("name", { ascending: true }),
       supabase

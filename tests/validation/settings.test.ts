@@ -35,12 +35,26 @@ describe("settings validation schemas", () => {
     const category = categorySettingsSchema.parse({
       name: " 식비 ",
       type: "expense",
+      parentCategoryId: "living",
       sortOrder: "10",
       status: "active"
     });
 
     expect(category.name).toBe("식비");
+    expect(category.parentCategoryId).toBe("living");
     expect(category.sortOrder).toBe(10);
+  });
+
+  it("treats an empty parent category as root category", () => {
+    const category = categorySettingsSchema.parse({
+      name: "생활비",
+      type: "expense",
+      parentCategoryId: "",
+      sortOrder: "10",
+      status: "active"
+    });
+
+    expect(category.parentCategoryId).toBeUndefined();
   });
 
   it("rejects negative budget amounts", () => {

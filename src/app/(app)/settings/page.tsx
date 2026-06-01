@@ -60,6 +60,10 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const budgetByCategory = new Map(
     budgets.map((budget) => [budget.category_id, Number(budget.amount)])
   );
+  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
+  const rootCategories = categories.filter(
+    (category) => category.parent_category_id === null && category.status === "active"
+  );
 
   return (
     <div className="space-y-8">
@@ -138,9 +142,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-normal text-ink">카테고리 관리</h2>
         <div className="grid gap-3">
-          <CategoryForm title="새 카테고리 추가" />
+          <CategoryForm title="새 카테고리 추가" rootCategories={rootCategories} />
           {categories.map((category) => (
-            <CategoryForm key={category.id} title={category.name} category={category} />
+            <CategoryForm
+              key={category.id}
+              title={category.name}
+              category={category}
+              rootCategories={rootCategories.filter((root) => root.id !== category.id)}
+            />
           ))}
         </div>
       </section>
@@ -165,7 +174,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 <input name="month" type="hidden" value={month} />
                 <input name="categoryId" type="hidden" value={category.id} />
                 <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
-                  {category.name}
+                  {categoryDisplayName(category, categoryNameById)}
                   <input
                     className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
                     defaultValue={budgetByCategory.get(category.id) ?? 0}
@@ -285,16 +294,33 @@ type CategoryFormProps = {
     id: string;
     name: string;
     type: "income" | "expense" | "transfer";
+    parent_category_id: string | null;
     sort_order: number;
     status: "active" | "archived";
   };
+  rootCategories: Array<{
+    id: string;
+    name: string;
+    type: "income" | "expense" | "transfer";
+  }>;
 };
 
-function CategoryForm({ title, category }: CategoryFormProps) {
+function categoryDisplayName(
+  category: { name: string; parent_category_id: string | null },
+  categoryNameById: Map<string, string>
+) {
+  const parentName = category.parent_category_id
+    ? categoryNameById.get(category.parent_category_id)
+    : undefined;
+
+  return parentName ? `${parentName} > ${category.name}` : category.name;
+}
+
+function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
   return (
     <form
       action={saveCategory}
-      className="grid gap-3 rounded-md border border-line bg-white p-4 shadow-sm lg:grid-cols-[1.3fr_1fr_1fr_1fr_auto]"
+      className="grid gap-3 rounded-md border border-line bg-white p-4 shadow-sm lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr_auto]"
     >
       {category ? <input name="id" type="hidden" value={category.id} /> : null}
       <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
@@ -318,6 +344,21 @@ function CategoryForm({ title, category }: CategoryFormProps) {
           {categoryTypes.map((type) => (
             <option key={type} value={type}>
               {categoryTypeLabel(type)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        상위 카테고리
+        <select
+          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          defaultValue={category?.parent_category_id ?? ""}
+          name="parentCategoryId"
+        >
+          <option value="">대분류</option>
+          {rootCategories.map((root) => (
+            <option key={root.id} value={root.id}>
+              {categoryTypeLabel(root.type)} · {root.name}
             </option>
           ))}
         </select>
