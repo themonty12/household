@@ -280,6 +280,46 @@ Commit with message:
 Report Status, files changed, verification results, commit SHA, and concerns.
 ```
 
+## Prompt 75 - Final Whole-Branch Code Re-Review
+
+- Agent: `019e8091-8315-7b83-9c35-54c797fc68fe` / Laplace
+- Type: final code re-reviewer
+- Result: ready to merge
+
+Message content:
+
+```text
+You are doing the final whole-branch code re-review after fixes.
+
+Work from: C:\Users\themo\Documents\Harness\.worktrees\household-finance-mvp
+
+Previous final review found:
+1. Missing Supabase SSR session refresh middleware.
+2. Category type not enforced against transaction type.
+3. fixedCostRatio semantics/persistence mismatch.
+4. Deployment checklist described settings UI flows that do not exist.
+5. SUPABASE_SERVICE_ROLE_KEY was documented/validated as required despite unused code.
+
+Fix commit:
+- b33d149 fix: harden auth refresh and transaction integrity
+
+Verify current code resolves those issues without regressions. Pay particular attention to:
+- middleware/proxy correctness for Supabase SSR cookies
+- transaction category filtering and server/DB integrity
+- monthly-close fixedCostRatio semantics and tests
+- env requirements after removing service role key
+- deployment docs accuracy
+- build/test/e2e readiness
+
+Use standard review output:
+- Strengths
+- Issues by severity: Critical, Important, Minor
+- Recommendations
+- Assessment with Ready to merge verdict
+
+Do not edit files. Do not revert changes. If you find an issue, include exact file:line references and a concrete fix recommendation.
+```
+
 ## Prompt 72 - Task 10 Code Quality Re-Review
 
 - Agent: `019e723d-9f78-7982-9e1c-cc309e1fb2fb` / Carver
