@@ -12,13 +12,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const hasInvalidCredentials = error === "invalid";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-mist px-4 py-10 text-ink sm:px-6">
-      <section className="w-full max-w-md rounded-md border border-line bg-white px-6 py-8 shadow-[0_18px_60px_rgba(23,33,31,0.10)] sm:px-8">
+    <main className="grid min-h-screen bg-mist text-ink lg:grid-cols-[minmax(22rem,0.8fr)_minmax(28rem,1.2fr)]">
+      <section className="hidden bg-slate p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="text-lg font-bold">우리집 가계부</div>
+        <div className="max-w-md space-y-3">
+          <p className="text-sm font-bold text-leaf">가족을 위한 재정 기록</p>
+          <h1 className="text-4xl font-bold leading-tight">함께 기록하고,<br />한눈에 결산하세요.</h1>
+          <p className="text-sm leading-6 text-white/55">허용된 가족 구성원만 접근할 수 있는 안전한 가계부입니다.</p>
+        </div>
+        <p className="text-xs text-white/35">Private household finance</p>
+      </section>
+      <div className="flex items-center justify-center px-4 py-10 sm:px-6">
+      <section className="panel w-full max-w-md px-6 py-8 sm:px-8">
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-normal text-leaf">
             초대된 사용자만 접근 가능
           </p>
-          <h1 className="text-3xl font-semibold tracking-normal text-ink">로그인</h1>
+          <h1 className="text-3xl font-bold text-ink">로그인</h1>
           <p className="text-sm leading-6 text-ink/70">
             우리집 가계부는 허용된 가족 구성원만 사용할 수 있습니다. 등록된 이메일과
             비밀번호로 로그인해 주세요.
@@ -41,7 +51,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </label>
             <input
               autoComplete="email"
-              className="h-11 w-full rounded-md border border-line bg-white px-3 text-ink outline-none transition-colors placeholder:text-ink/40 focus:border-leaf focus:ring-2 focus:ring-leaf/20"
+              className="field-control w-full"
               id="email"
               name="email"
               required
@@ -55,7 +65,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </label>
             <input
               autoComplete="current-password"
-              className="h-11 w-full rounded-md border border-line bg-white px-3 text-ink outline-none transition-colors placeholder:text-ink/40 focus:border-leaf focus:ring-2 focus:ring-leaf/20"
+              className="field-control w-full"
               id="password"
               name="password"
               required
@@ -64,13 +74,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <button
-            className="flex h-11 w-full items-center justify-center rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90 focus:outline-none focus:ring-2 focus:ring-leaf/30 focus:ring-offset-2"
+            className="button-primary w-full"
             type="submit"
           >
             로그인
           </button>
         </form>
       </section>
+      </div>
     </main>
   );
 }

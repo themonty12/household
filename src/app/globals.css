@@ -4,15 +4,16 @@
 
 :root {
   color-scheme: light;
-  background: #f6f7f4;
-  color: #17211f;
+  background: #f7f9fb;
+  color: #172033;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #f6f7f4;
-  color: #17211f;
+  background: #f7f9fb;
+  color: #172033;
+  font-family: Inter, Pretendard, "Noto Sans KR", system-ui, sans-serif;
 }
 
 button,
@@ -20,4 +21,38 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+@layer components {
+  .page-title {
+    @apply text-2xl font-bold text-ink;
+  }
+
+  .section-title {
+    @apply text-base font-bold text-ink;
+  }
+
+  .panel {
+    @apply rounded-lg border border-line bg-white shadow-panel;
+  }
+
+  .field-label {
+    @apply flex flex-col gap-1.5 text-sm font-semibold text-ink/70;
+  }
+
+  .field-control {
+    @apply h-12 rounded-md border border-transparent bg-paper px-3 text-ink outline-none transition placeholder:text-ink/35 focus:border-leaf focus:bg-white focus:ring-2 focus:ring-leaf/10 sm:h-11;
+  }
+
+  .button-primary {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-md bg-slate px-4 text-sm font-bold text-white transition hover:bg-slate/90 focus:outline-none focus:ring-2 focus:ring-slate/20 focus:ring-offset-2 sm:h-11;
+  }
+
+  .button-add {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-md bg-leaf px-4 text-sm font-bold text-white transition hover:bg-leaf/90 focus:outline-none focus:ring-2 focus:ring-leaf/20 focus:ring-offset-2 sm:h-11;
+  }
+
+  .button-secondary {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-bold text-ink transition hover:bg-paper focus:outline-none focus:ring-2 focus:ring-slate/10 sm:h-11;
+  }
 }

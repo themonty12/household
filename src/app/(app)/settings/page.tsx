@@ -1,4 +1,5 @@
 import { saveAccount, saveBudget, saveCategory } from "@/app/actions/settings";
+import { ChevronDown, PiggyBank, Plus, Tags, Users, WalletCards } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require-user";
 import {
   accountTypeLabel,
@@ -68,9 +69,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   return (
     <div className="space-y-8">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-normal text-ink">설정</h1>
-          <p className="text-sm leading-6 text-ink/70">
+        <div className="space-y-1">
+          <h1 className="page-title">설정</h1>
+          <p className="text-sm leading-6 text-ink/55">
             계좌, 카테고리, 월 예산을 관리합니다. 보관 처리한 항목은 과거 기록을
             유지하면서 입력 화면에서 제외됩니다.
           </p>
@@ -78,13 +79,13 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         <form action="/settings" className="flex items-center gap-2">
           <input
             aria-label="예산 월"
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm text-ink shadow-sm"
+            className="field-control min-w-0 flex-1 text-sm sm:w-40"
             defaultValue={monthInputValue(month)}
             name="month"
             type="month"
           />
           <button
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-paper"
+            className="button-secondary shrink-0"
             type="submit"
           >
             예산 월 보기
@@ -93,8 +94,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </div>
 
       <section className="grid gap-3 lg:grid-cols-[18rem_1fr]">
-        <div className="rounded-md border border-line bg-white p-4 shadow-sm">
-          <h2 className="text-base font-semibold tracking-normal text-ink">현재 관리자</h2>
+        <div className="panel p-4">
+          <div className="flex items-center gap-2">
+            <Users aria-hidden="true" className="h-4 w-4 text-leaf" />
+            <h2 className="section-title">현재 관리자</h2>
+          </div>
           <p className="mt-3 truncate text-sm font-semibold text-ink">
             {profile.display_name}
           </p>
@@ -103,9 +107,9 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </p>
         </div>
 
-        <div className="rounded-md border border-line bg-white p-4 shadow-sm">
+        <div className="panel p-4">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold tracking-normal text-ink">
+            <h2 className="section-title">
               가족 구성원
             </h2>
             <span className="text-sm text-ink/60">{profiles.length}명</span>
@@ -130,9 +134,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold tracking-normal text-ink">계좌 관리</h2>
+        <div className="flex items-center gap-2">
+          <WalletCards aria-hidden="true" className="h-5 w-5 text-leaf" />
+          <h2 className="text-lg font-bold text-ink">계좌 관리</h2>
+        </div>
         <div className="grid gap-3">
-          <AccountForm title="새 계좌 추가" />
+          <AccountForm title="새 계좌 추가" isNew />
           {accounts.map((account) => (
             <AccountForm key={account.id} title={account.name} account={account} />
           ))}
@@ -140,9 +147,12 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold tracking-normal text-ink">카테고리 관리</h2>
+        <div className="flex items-center gap-2">
+          <Tags aria-hidden="true" className="h-5 w-5 text-leaf" />
+          <h2 className="text-lg font-bold text-ink">카테고리 관리</h2>
+        </div>
         <div className="grid gap-3">
-          <CategoryForm title="새 카테고리 추가" rootCategories={rootCategories} />
+          <CategoryForm title="새 카테고리 추가" rootCategories={rootCategories} isNew />
           {categories.map((category) => (
             <CategoryForm
               key={category.id}
@@ -156,11 +166,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold tracking-normal text-ink">월 예산 관리</h2>
+          <div className="flex items-center gap-2">
+            <PiggyBank aria-hidden="true" className="h-5 w-5 text-leaf" />
+            <h2 className="text-lg font-bold text-ink">월 예산 관리</h2>
+          </div>
           <span className="text-sm text-ink/60">{monthInputValue(month)}</span>
         </div>
         {expenseCategories.length === 0 ? (
-          <div className="rounded-md border border-line bg-white p-4 text-sm text-ink/65 shadow-sm">
+          <div className="panel p-4 text-sm text-ink/65">
             예산을 설정하려면 먼저 사용 중인 지출 카테고리를 추가해 주세요.
           </div>
         ) : (
@@ -169,14 +182,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <form
                 key={category.id}
                 action={saveBudget}
-                className="grid gap-3 rounded-md border border-line bg-white p-4 shadow-sm sm:grid-cols-[1fr_auto]"
+                className="panel grid gap-3 p-4 sm:grid-cols-[1fr_auto]"
               >
                 <input name="month" type="hidden" value={month} />
                 <input name="categoryId" type="hidden" value={category.id} />
-                <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+                <label className="field-label">
                   {categoryDisplayName(category, categoryNameById)}
                   <input
-                    className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+                    className="field-control"
                     defaultValue={budgetByCategory.get(category.id) ?? 0}
                     min="0"
                     name="amount"
@@ -185,7 +198,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   />
                 </label>
                 <button
-                  className="h-10 self-end rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90"
+                  className="button-primary self-end"
                   type="submit"
                 >
                   예산 저장
@@ -201,6 +214,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
 type AccountFormProps = {
   title: string;
+  isNew?: boolean;
   account?: {
     id: string;
     name: string;
@@ -211,17 +225,32 @@ type AccountFormProps = {
   };
 };
 
-function AccountForm({ title, account }: AccountFormProps) {
+function AccountForm({ title, account, isNew = false }: AccountFormProps) {
   return (
-    <form
-      action={saveAccount}
-      className="grid gap-3 rounded-md border border-line bg-white p-4 shadow-sm lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto]"
-    >
-      {account ? <input name="id" type="hidden" value={account.id} /> : null}
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+    <details className="panel group overflow-hidden" open={isNew || undefined}>
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${isNew ? "bg-leaf text-white" : "bg-paper text-ink/55"}`}>
+            {isNew ? <Plus aria-hidden="true" className="h-4 w-4" /> : <WalletCards aria-hidden="true" className="h-4 w-4" />}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-ink">{title}</span>
+            <span className="mt-0.5 block text-xs text-ink/45">
+              {account ? `${accountTypeLabel(account.type)} · ${recordStatusLabel(account.status)}` : "새 계좌 정보를 입력하세요."}
+            </span>
+          </span>
+        </div>
+        <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-ink/40 transition group-open:rotate-180" />
+      </summary>
+      <form
+        action={saveAccount}
+        className="grid gap-3 border-t border-line bg-paper/45 p-4 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto]"
+      >
+        {account ? <input name="id" type="hidden" value={account.id} /> : null}
+        <label className="field-label">
         계좌명
         <input
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={account?.name}
           maxLength={80}
           name="name"
@@ -229,10 +258,10 @@ function AccountForm({ title, account }: AccountFormProps) {
           required
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         유형
         <select
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={account?.type ?? "bank"}
           name="type"
         >
@@ -243,10 +272,10 @@ function AccountForm({ title, account }: AccountFormProps) {
           ))}
         </select>
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         현재 잔액
         <input
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={account?.current_balance ?? 0}
           name="currentBalance"
           step="0.01"
@@ -254,10 +283,10 @@ function AccountForm({ title, account }: AccountFormProps) {
         />
       </label>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        <label className="field-label">
           상태
           <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control bg-white"
             defaultValue={account?.status ?? "active"}
             name="status"
           >
@@ -270,7 +299,7 @@ function AccountForm({ title, account }: AccountFormProps) {
         </label>
         <label className="flex items-center gap-2 text-sm font-medium text-ink/75">
           <input
-            className="h-4 w-4 rounded border-line text-leaf"
+          className="h-4 w-4 rounded border-line text-leaf"
             defaultChecked={account?.include_in_net_worth ?? true}
             name="includeInNetWorth"
             type="checkbox"
@@ -279,17 +308,19 @@ function AccountForm({ title, account }: AccountFormProps) {
         </label>
       </div>
       <button
-        className="h-10 self-end rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90"
+        className="button-primary self-end"
         type="submit"
       >
         저장
       </button>
-    </form>
+      </form>
+    </details>
   );
 }
 
 type CategoryFormProps = {
   title: string;
+  isNew?: boolean;
   category?: {
     id: string;
     name: string;
@@ -316,17 +347,32 @@ function categoryDisplayName(
   return parentName ? `${parentName} > ${category.name}` : category.name;
 }
 
-function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
+function CategoryForm({ title, category, rootCategories, isNew = false }: CategoryFormProps) {
   return (
-    <form
-      action={saveCategory}
-      className="grid gap-3 rounded-md border border-line bg-white p-4 shadow-sm lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr_auto]"
-    >
-      {category ? <input name="id" type="hidden" value={category.id} /> : null}
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+    <details className="panel group overflow-hidden" open={isNew || undefined}>
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${isNew ? "bg-leaf text-white" : "bg-paper text-ink/55"}`}>
+            {isNew ? <Plus aria-hidden="true" className="h-4 w-4" /> : <Tags aria-hidden="true" className="h-4 w-4" />}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-ink">{title}</span>
+            <span className="mt-0.5 block text-xs text-ink/45">
+              {category ? `${categoryTypeLabel(category.type)} · ${recordStatusLabel(category.status)}` : "대분류 또는 소분류를 추가하세요."}
+            </span>
+          </span>
+        </div>
+        <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-ink/40 transition group-open:rotate-180" />
+      </summary>
+      <form
+        action={saveCategory}
+        className="grid gap-3 border-t border-line bg-paper/45 p-4 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr_auto]"
+      >
+        {category ? <input name="id" type="hidden" value={category.id} /> : null}
+        <label className="field-label">
         카테고리명
         <input
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={category?.name}
           maxLength={80}
           name="name"
@@ -334,10 +380,10 @@ function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
           required
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         유형
         <select
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={category?.type ?? "expense"}
           name="type"
         >
@@ -348,10 +394,10 @@ function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
           ))}
         </select>
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         상위 카테고리
         <select
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={category?.parent_category_id ?? ""}
           name="parentCategoryId"
         >
@@ -363,20 +409,20 @@ function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
           ))}
         </select>
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         정렬
         <input
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={category?.sort_order ?? 0}
           min="0"
           name="sortOrder"
           type="number"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+      <label className="field-label">
         상태
         <select
-          className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+          className="field-control bg-white"
           defaultValue={category?.status ?? "active"}
           name="status"
         >
@@ -388,11 +434,12 @@ function CategoryForm({ title, category, rootCategories }: CategoryFormProps) {
         </select>
       </label>
       <button
-        className="h-10 self-end rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90"
+        className="button-primary self-end"
         type="submit"
       >
         저장
       </button>
-    </form>
+      </form>
+    </details>
   );
 }

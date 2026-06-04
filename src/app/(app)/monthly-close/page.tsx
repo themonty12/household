@@ -62,13 +62,13 @@ export default async function MonthlyClosePage({
       : Number(savedClose.net_worth_change);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-normal text-ink">
+        <div className="space-y-1">
+          <h1 className="page-title">
             월 결산
           </h1>
-          <p className="text-sm leading-6 text-ink/70">
+          <p className="text-sm leading-6 text-ink/55">
             거래, 예산, 자산 스냅샷이 바뀐 뒤 월별 결산과 의견을 다시 생성합니다.
           </p>
         </div>
@@ -76,13 +76,13 @@ export default async function MonthlyClosePage({
         <form action="/monthly-close" className="flex items-center gap-2">
           <input
             aria-label="월"
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm text-ink shadow-sm"
+            className="field-control min-w-0 flex-1 text-sm sm:w-40"
             defaultValue={monthInputValue(month)}
             name="month"
             type="month"
           />
           <button
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-paper"
+            className="button-secondary shrink-0"
             type="submit"
           >
             조회
@@ -110,10 +110,10 @@ export default async function MonthlyClosePage({
       </section>
 
       <section className="grid gap-3 lg:grid-cols-[1fr_18rem]">
-        <div className="space-y-3 rounded-md border border-line bg-white p-4 shadow-sm">
+        <div className="panel space-y-3 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold tracking-normal text-ink">
+              <h2 className="section-title">
                 결산 상태
               </h2>
               <p className="mt-1 text-sm text-ink/65">
@@ -126,7 +126,7 @@ export default async function MonthlyClosePage({
               <form action={regenerateMonthlyClose}>
                 <input name="month" type="hidden" value={month} />
                 <button
-                  className="h-10 rounded-md bg-ink px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ink/85"
+                  className="button-primary"
                   type="submit"
                 >
                   다시 생성
@@ -153,8 +153,8 @@ export default async function MonthlyClosePage({
           </dl>
         </div>
 
-        <div className="rounded-md border border-line bg-white p-4 shadow-sm">
-          <h2 className="text-base font-semibold tracking-normal text-ink">자산 스냅샷</h2>
+        <div className="panel p-4">
+          <h2 className="section-title">자산 스냅샷</h2>
           {snapshot ? (
             <dl className="mt-3 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-3">
@@ -180,12 +180,12 @@ export default async function MonthlyClosePage({
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold tracking-normal text-ink">자동 의견</h2>
+          <h2 className="section-title">자동 의견</h2>
           <span className="text-sm text-ink/60">{insights.length}개 저장됨</span>
         </div>
 
         {insights.length === 0 ? (
-          <div className="rounded-md border border-line bg-white p-4 text-sm text-ink/65 shadow-sm">
+          <div className="panel p-4 text-sm text-ink/65">
             이 월의 자동 의견을 저장하려면 결산을 다시 생성해 주세요.
           </div>
         ) : (

@@ -19,10 +19,10 @@ export default async function AssetsPage() {
   const netWorth = assets - liabilities;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-normal text-ink">자산</h1>
-        <p className="text-sm leading-6 text-ink/70">
+    <div className="space-y-7">
+      <div className="space-y-1">
+        <h1 className="page-title">자산</h1>
+        <p className="text-sm leading-6 text-ink/55">
           사용 중인 계좌와 우리집 순자산 상태를 확인합니다.
         </p>
       </div>
@@ -35,11 +35,11 @@ export default async function AssetsPage() {
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold tracking-normal text-ink">계좌</h2>
-          <span className="text-sm text-ink/60">{accounts.length}개 사용 중</span>
+          <h2 className="section-title">계좌</h2>
+          <span className="text-sm font-semibold text-ink/45">{accounts.length}개 사용 중</span>
         </div>
 
-        <div className="overflow-hidden rounded-md border border-line bg-white shadow-sm">
+        <div className="panel overflow-hidden">
           {accounts.length === 0 ? (
             <p className="p-4 text-sm text-ink/65">아직 사용 중인 계좌가 없습니다.</p>
           ) : (
@@ -51,7 +51,7 @@ export default async function AssetsPage() {
                 return (
                   <li
                     key={account.id}
-                    className="grid gap-2 p-4 sm:grid-cols-[1fr_auto] sm:items-center"
+                    className="grid gap-2 p-4 transition hover:bg-paper/70 sm:grid-cols-[1fr_auto] sm:items-center"
                   >
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -59,7 +59,7 @@ export default async function AssetsPage() {
                           {account.name}
                         </p>
                         {!account.include_in_net_worth ? (
-                          <span className="rounded-md border border-line px-2 py-0.5 text-xs text-ink/60">
+                          <span className="rounded-md bg-paper px-2 py-1 text-xs font-semibold text-ink/50">
                             순자산 제외
                           </span>
                         ) : null}

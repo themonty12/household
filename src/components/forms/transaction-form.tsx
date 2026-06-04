@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 
 import { createTransaction } from "@/app/actions/transactions";
 import { transactionTypeLabel } from "@/lib/domain/labels";
@@ -67,14 +68,17 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
   return (
     <form
       action={createTransaction}
-      className="space-y-4 rounded-md border border-line bg-white p-4 shadow-sm"
+      className="panel space-y-5 p-4 sm:p-5"
     >
-      <div className="flex flex-col gap-1">
-        <h2 className="text-base font-semibold tracking-normal text-ink">거래 입력</h2>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="section-title">거래 입력</h2>
+          <p className="mt-1 text-sm text-ink/50">수입과 지출을 빠르게 기록하세요.</p>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        <label className="field-label">
           금액
           <input
             name="amount"
@@ -82,12 +86,12 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             min="0.01"
             step="0.01"
             required
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control text-lg font-bold"
             placeholder="0"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        <label className="field-label">
           날짜
           <input
             name="date"
@@ -95,11 +99,11 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             value={date}
             onChange={(event) => setDate(event.target.value)}
             required
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        <label className="field-label">
           유형
           <select
             name="type"
@@ -110,7 +114,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               setToAccountId("");
             }}
             required
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control"
           >
             {transactionTypes.map((type) => (
               <option key={type.value} value={type.value}>
@@ -120,7 +124,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+        <label className="field-label">
           계좌
           <select
             name="accountId"
@@ -134,7 +138,7 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
               }
             }}
             required
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control"
           >
             <option value="">계좌 선택</option>
             {accounts.map((account) => (
@@ -146,14 +150,14 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
         </label>
 
         {isTransfer ? (
-          <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+          <label className="field-label">
             받을 계좌
             <select
               name="toAccountId"
               value={toAccountId}
               onChange={(event) => setToAccountId(event.target.value)}
               required
-              className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+              className="field-control"
             >
               <option value="">받을 계좌 선택</option>
               {accounts.map((account) => (
@@ -164,14 +168,14 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
             </select>
           </label>
         ) : (
-          <label className="flex flex-col gap-1 text-sm font-medium text-ink/75">
+          <label className="field-label">
             카테고리
             <select
               name="categoryId"
               value={categoryId}
               onChange={(event) => setCategoryId(event.target.value)}
               required
-              className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+              className="field-control"
             >
               <option value="">카테고리 선택</option>
               {filteredCategories.map((category) => (
@@ -183,12 +187,12 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
           </label>
         )}
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-ink/75 sm:col-span-2">
+        <label className="field-label sm:col-span-2">
           메모
           <input
             name="memo"
             maxLength={240}
-            className="h-10 rounded-md border border-line bg-white px-3 text-ink outline-none focus:border-leaf"
+            className="field-control"
             placeholder="선택 입력"
           />
         </label>
@@ -197,8 +201,9 @@ export function TransactionForm({ accounts, categories }: TransactionFormProps) 
       <div className="flex justify-end">
         <button
           type="submit"
-          className="h-10 rounded-md bg-leaf px-4 text-sm font-semibold text-white transition-colors hover:bg-leaf/90"
+          className="button-add w-full sm:w-auto"
         >
+          <Plus aria-hidden="true" className="h-4 w-4" />
           저장
         </button>
       </div>

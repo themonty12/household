@@ -10,15 +10,15 @@ type SummaryCardProps = {
 
 const toneClasses: Record<SummaryCardTone, string> = {
   neutral: "border-line bg-white text-ink",
-  positive: "border-leaf/30 bg-leaf/10 text-leaf",
-  warning: "border-gold/40 bg-gold/10 text-gold"
+  positive: "border-leaf/20 bg-white text-leaf",
+  warning: "border-coral/20 bg-white text-coral"
 };
 
 export function SummaryCard({ label, value, tone = "neutral" }: SummaryCardProps) {
   return (
-    <div className={clsx("rounded-md border p-4 shadow-sm", toneClasses[tone])}>
-      <p className="text-sm font-medium text-ink/65">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-normal text-current">{value}</p>
+    <div className={clsx("rounded-lg border p-4 shadow-panel", toneClasses[tone])}>
+      <p className="text-xs font-bold text-ink/50">{label}</p>
+      <p className="mt-2 text-xl font-bold text-current sm:text-2xl">{value}</p>
     </div>
   );
 }
