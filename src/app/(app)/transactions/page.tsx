@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, List, WalletCards } from "lucide-react";
+import { CalendarDays, List } from "lucide-react";
 
 import { requireUser } from "@/lib/auth/require-user";
 import { formatWon } from "@/lib/domain/format";
@@ -51,6 +51,15 @@ function addDays(date: Date, count: number) {
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + count);
   return next;
+}
+
+const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"] as const;
+const calendarAmountFormatter = new Intl.NumberFormat("ko-KR", {
+  maximumFractionDigits: 0
+});
+
+function formatCalendarAmount(value: number) {
+  return calendarAmountFormatter.format(Math.round(value));
 }
 
 function relationName(relation: TodayRelationName, fallback: string) {
@@ -261,41 +270,73 @@ function CalendarView({
   startDate: string;
   transactions: TransactionHistoryItem[];
 }) {
-  const days = buildDateRange(startDate, endDate);
+  const days = buildCalendarDays(startDate, endDate);
   const grouped = groupByDate(transactions);
 
   return (
-    <section className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-7">
-      {days.map((date) => {
-        const items = grouped[date] ?? [];
-        const income = items
-          .filter((transaction) => transaction.type === "income")
-          .reduce((total, transaction) => total + Number(transaction.amount), 0);
-        const expense = items
-          .filter((transaction) => transaction.type === "expense")
-          .reduce((total, transaction) => total + Number(transaction.amount), 0);
-
-        return (
-          <div key={date} className="panel min-h-32 p-3">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-bold text-ink/45">{date.slice(5)}</p>
-              <span className="text-xs text-ink/35">{items.length}건</span>
-            </div>
-            <div className="mt-3 space-y-1">
-              {income > 0 ? <p className="text-xs font-bold text-leaf">+ {formatWon(income)}</p> : null}
-              {expense > 0 ? <p className="text-xs font-bold text-coral">- {formatWon(expense)}</p> : null}
-            </div>
-            <div className="mt-3 space-y-1">
-              {items.slice(0, 3).map((transaction) => (
-                <p key={transaction.id} className={`truncate text-xs font-semibold ${amountTone(transaction.type)}`}>
-                  {transaction.memo || relationName(transaction.categories, transactionTypeLabel(transaction.type))}
-                </p>
-              ))}
-              {items.length > 3 ? <p className="text-xs text-ink/35">+{items.length - 3}건 더</p> : null}
-            </div>
+    <section className="panel overflow-hidden bg-white">
+      <div className="grid grid-cols-7 border-b border-line bg-white">
+        {weekdayLabels.map((weekday, index) => (
+          <div
+            key={weekday}
+            className={`py-2 text-center text-xs font-bold ${
+              index === 0 ? "text-coral" : index === 6 ? "text-info" : "text-ink/45"
+            }`}
+          >
+            {weekday}
           </div>
-        );
-      })}
+        ))}
+      </div>
+      <div className="grid grid-cols-7 bg-white">
+        {days.map((date, index) => {
+          if (!date) {
+            return (
+              <div
+                key={`blank-${index}`}
+                className="min-h-[76px] border-b border-r border-line/50 bg-mist/35 sm:min-h-32"
+              />
+            );
+          }
+
+          const items = grouped[date] ?? [];
+          const income = items
+            .filter((transaction) => transaction.type === "income")
+            .reduce((total, transaction) => total + Number(transaction.amount), 0);
+          const expense = items
+            .filter((transaction) => transaction.type === "expense")
+            .reduce((total, transaction) => total + Number(transaction.amount), 0);
+          const day = Number(date.slice(8, 10));
+
+          return (
+            <div key={date} className="min-w-0 border-b border-r border-line/50 p-1.5 sm:min-h-32 sm:p-3">
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[11px] font-bold text-ink/55 sm:text-xs">{day}</p>
+                <span className="hidden text-xs text-ink/35 md:inline">{items.length}건</span>
+              </div>
+              <div className="mt-2 min-w-0 space-y-0.5 sm:mt-3 sm:space-y-1">
+                {income > 0 ? (
+                  <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-leaf sm:text-xs">
+                    +{formatCalendarAmount(income)}
+                  </p>
+                ) : null}
+                {expense > 0 ? (
+                  <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-coral sm:text-xs">
+                    -{formatCalendarAmount(expense)}
+                  </p>
+                ) : null}
+              </div>
+              <div className="mt-3 hidden space-y-1 md:block">
+                {items.slice(0, 3).map((transaction) => (
+                  <p key={transaction.id} className={`truncate text-xs font-semibold ${amountTone(transaction.type)}`}>
+                    {transaction.memo || relationName(transaction.categories, transactionTypeLabel(transaction.type))}
+                  </p>
+                ))}
+                {items.length > 3 ? <p className="text-xs text-ink/35">+{items.length - 3}건 더</p> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
@@ -308,10 +349,10 @@ function groupByDate(transactions: TransactionHistoryItem[]) {
   }, {});
 }
 
-function buildDateRange(startDate: string, endDate: string) {
+function buildCalendarDays(startDate: string, endDate: string) {
   const start = new Date(`${startDate}T00:00:00.000Z`);
   const end = new Date(`${endDate}T00:00:00.000Z`);
-  const days: string[] = [];
+  const days: Array<string | null> = Array.from({ length: start.getUTCDay() }, () => null);
 
   for (let cursor = start; cursor <= end; cursor = addDays(cursor, 1)) {
     days.push(formatDate(cursor));
