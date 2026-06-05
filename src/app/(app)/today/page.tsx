@@ -4,6 +4,7 @@ import { ArrowDownLeft, ArrowRightLeft, ArrowUpRight, Pencil, WalletCards } from
 import { requireUser } from "@/lib/auth/require-user";
 import { formatWon } from "@/lib/domain/format";
 import { accountTypeLabel, transactionTypeLabel } from "@/lib/domain/labels";
+import { categoryOptionLabel, editableCategoriesForTransaction } from "@/lib/domain/transaction-detail";
 import { getTodayData } from "@/lib/repositories/finance";
 import type { TodayCategory, TodayRelationName, TodayTransaction } from "@/lib/repositories/finance";
 
@@ -41,14 +42,6 @@ function transactionAmountClass(type: string) {
   }
 
   return "text-info";
-}
-
-function categoryOptionLabel(category: TodayCategory, categories: TodayCategory[]) {
-  const parent = category.parent_category_id
-    ? categories.find((candidate) => candidate.id === category.parent_category_id)
-    : undefined;
-
-  return parent ? `${parent.name} > ${category.name}` : category.name;
 }
 
 export default async function TodayPage() {
@@ -185,21 +178,7 @@ function TransactionEditForm({
   categories: TodayCategory[];
   transaction: TodayTransaction;
 }) {
-  const usableCategories = categories.filter((category) => {
-    if (transaction.type === "income") {
-      return category.type === "income";
-    }
-
-    if (transaction.type === "expense") {
-      return category.type === "expense";
-    }
-
-    if (transaction.type === "adjustment") {
-      return category.type === "income" || category.type === "expense";
-    }
-
-    return false;
-  });
+  const usableCategories = editableCategoriesForTransaction(transaction.type, categories);
 
   return (
     <form action={updateTransaction} className="grid gap-3 border-t border-line bg-paper/50 p-3">

@@ -1,19 +1,28 @@
 import Link from "next/link";
-import { CalendarDays, List } from "lucide-react";
+import type { Route } from "next";
+import { CalendarDays, ChevronRight, List, Pencil } from "lucide-react";
 
+import { updateTransaction } from "@/app/actions/transactions";
 import { requireUser } from "@/lib/auth/require-user";
 import { formatWon } from "@/lib/domain/format";
 import { transactionTypeLabel } from "@/lib/domain/labels";
+import { categoryOptionLabel, editableCategoriesForTransaction } from "@/lib/domain/transaction-detail";
 import {
   getTransactionsHistoryData,
   normalizeMonth,
   nextMonth
 } from "@/lib/repositories/finance";
-import type { TodayRelationName, TransactionHistoryItem } from "@/lib/repositories/finance";
+import type {
+  TodayAccount,
+  TodayCategory,
+  TodayRelationName,
+  TransactionHistoryItem
+} from "@/lib/repositories/finance";
 
 type TransactionsPageProps = {
   searchParams?: Promise<{
     end?: string;
+    day?: string;
     month?: string;
     start?: string;
     view?: string;
@@ -82,6 +91,37 @@ function chipTone(type: string) {
   return "bg-info/10 text-info";
 }
 
+function detailHref({
+  day,
+  endDate,
+  month,
+  periodMode,
+  startDate,
+  view
+}: {
+  day?: string;
+  endDate: string;
+  month: string;
+  periodMode: boolean;
+  startDate: string;
+  view: ViewMode;
+}) {
+  const query = new URLSearchParams({ view });
+
+  if (periodMode) {
+    query.set("start", startDate);
+    query.set("end", endDate);
+  } else {
+    query.set("month", monthInputValue(month));
+  }
+
+  if (day) {
+    query.set("day", day);
+  }
+
+  return `/transactions?${query.toString()}` as Route;
+}
+
 export default async function TransactionsPage({ searchParams }: TransactionsPageProps) {
   const params = await searchParams;
   const view: ViewMode = params?.view === "calendar" ? "calendar" : "list";
@@ -92,12 +132,13 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
   const startDate = periodMode ? params!.start! : monthStart;
   const endDate = periodMode ? params!.end! : monthEnd;
   const { profile, supabase } = await requireUser();
-  const { transactions } = await getTransactionsHistoryData(
+  const { accounts, categories, transactions } = await getTransactionsHistoryData(
     supabase,
     profile.household_id,
     startDate,
     endDate
   );
+  const selectedDate = isDate(params?.day) ? params!.day! : undefined;
   const incomeTotal = transactions
     .filter((transaction) => transaction.type === "income")
     .reduce((total, transaction) => total + Number(transaction.amount), 0);
@@ -179,9 +220,18 @@ export default async function TransactionsPage({ searchParams }: TransactionsPag
       </section>
 
       {view === "calendar" ? (
-        <CalendarView endDate={endDate} startDate={startDate} transactions={transactions} />
+        <CalendarView
+          accounts={accounts}
+          categories={categories}
+          endDate={endDate}
+          month={month}
+          periodMode={periodMode}
+          selectedDate={selectedDate}
+          startDate={startDate}
+          transactions={transactions}
+        />
       ) : (
-        <ListView transactions={transactions} />
+        <ListView accounts={accounts} categories={categories} transactions={transactions} />
       )}
     </div>
   );
@@ -210,7 +260,15 @@ function SummaryMetric({
   );
 }
 
-function ListView({ transactions }: { transactions: TransactionHistoryItem[] }) {
+function ListView({
+  accounts,
+  categories,
+  transactions
+}: {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
+  transactions: TransactionHistoryItem[];
+}) {
   const grouped = groupByDate(transactions);
 
   return (
@@ -224,7 +282,12 @@ function ListView({ transactions }: { transactions: TransactionHistoryItem[] }) 
               <div className="bg-paper/70 px-4 py-2 text-xs font-bold text-ink/45">{date}</div>
               <ul className="divide-y divide-line">
                 {items.map((transaction) => (
-                  <TransactionRow key={transaction.id} transaction={transaction} />
+                  <TransactionDisclosure
+                    accounts={accounts}
+                    categories={categories}
+                    key={transaction.id}
+                    transaction={transaction}
+                  />
                 ))}
               </ul>
             </div>
@@ -235,109 +298,295 @@ function ListView({ transactions }: { transactions: TransactionHistoryItem[] }) 
   );
 }
 
-function TransactionRow({ transaction }: { transaction: TransactionHistoryItem }) {
+function TransactionDisclosure({
+  accounts,
+  categories,
+  transaction
+}: {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
+  transaction: TransactionHistoryItem;
+}) {
   return (
-    <li className="grid gap-2 px-4 py-3 sm:grid-cols-[1fr_auto] sm:items-center">
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={`rounded-md px-2 py-1 text-xs font-bold ${chipTone(transaction.type)}`}>
-            {transactionTypeLabel(transaction.type)}
-          </span>
-          <p className="truncate text-sm font-bold text-ink">
-            {transaction.memo || relationName(transaction.categories, "카테고리")}
-          </p>
-        </div>
-        <p className="mt-1 truncate text-xs text-ink/45">
-          {relationName(transaction.accounts, "계좌")}
-          {transaction.type === "transfer"
-            ? ` → ${relationName(transaction.to_account, "받을 계좌")}`
-            : ` · ${relationName(transaction.categories, "카테고리")}`}
-        </p>
-      </div>
-      <p className={`text-sm font-bold sm:text-right ${amountTone(transaction.type)}`}>
-        {formatWon(Number(transaction.amount))}
-      </p>
+    <li>
+      <details className="group">
+        <summary className="grid cursor-pointer list-none gap-2 px-4 py-3 transition hover:bg-paper/70 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`rounded-md px-2 py-1 text-xs font-bold ${chipTone(transaction.type)}`}>
+                {transactionTypeLabel(transaction.type)}
+              </span>
+              <p className="truncate text-sm font-bold text-ink">
+                {transaction.memo || relationName(transaction.categories, "카테고리")}
+              </p>
+            </div>
+            <p className="mt-1 truncate text-xs text-ink/45">
+              {transaction.date} · {relationName(transaction.accounts, "계좌")}
+              {transaction.type === "transfer"
+                ? ` → ${relationName(transaction.to_account, "받을 계좌")}`
+                : ` · ${relationName(transaction.categories, "카테고리")}`}
+            </p>
+          </div>
+          <div className="flex items-center justify-between gap-3 sm:justify-end">
+            <p className={`text-sm font-bold sm:text-right ${amountTone(transaction.type)}`}>
+              {formatWon(Number(transaction.amount))}
+            </p>
+            <Pencil aria-hidden="true" className="h-3.5 w-3.5 text-ink/30 transition group-open:text-info" />
+          </div>
+        </summary>
+        <TransactionDetailPanel accounts={accounts} categories={categories} transaction={transaction} />
+      </details>
     </li>
   );
 }
 
+function TransactionDetailPanel({
+  accounts,
+  categories,
+  transaction
+}: {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
+  transaction: TransactionHistoryItem;
+}) {
+  const accountName = relationName(transaction.accounts, "계좌");
+  const targetName = relationName(transaction.to_account, "받을 계좌");
+  const categoryName = relationName(transaction.categories, "카테고리");
+
+  return (
+    <div className="border-t border-line bg-paper/50 p-4">
+      <div className="grid gap-3 text-xs text-ink/55 sm:grid-cols-2 lg:grid-cols-4">
+        <DetailItem label="유형" value={transactionTypeLabel(transaction.type)} />
+        <DetailItem label="날짜" value={transaction.date} />
+        <DetailItem label="계좌" value={accountName} />
+        <DetailItem
+          label={transaction.type === "transfer" ? "받을 계좌" : "카테고리"}
+          value={transaction.type === "transfer" ? targetName : categoryName}
+        />
+        <DetailItem label="메모" value={transaction.memo || "메모 없음"} />
+        <DetailItem label="입력 시각" value={new Date(transaction.created_at).toLocaleString("ko-KR")} />
+      </div>
+      <TransactionEditForm accounts={accounts} categories={categories} transaction={transaction} />
+    </div>
+  );
+}
+
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="font-bold text-ink/35">{label}</p>
+      <p className="mt-1 truncate font-semibold text-ink/70">{value}</p>
+    </div>
+  );
+}
+
+function TransactionEditForm({
+  accounts,
+  categories,
+  transaction
+}: {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
+  transaction: TransactionHistoryItem;
+}) {
+  const usableCategories = editableCategoriesForTransaction(transaction.type, categories);
+
+  return (
+    <form action={updateTransaction} className="mt-4 grid gap-3">
+      <input name="id" type="hidden" value={transaction.id} />
+      <input name="type" type="hidden" value={transaction.type} />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="field-label">
+          날짜
+          <input className="field-control bg-white" defaultValue={transaction.date} name="date" required type="date" />
+        </label>
+        <label className="field-label">
+          금액
+          <input className="field-control bg-white" defaultValue={Number(transaction.amount)} min="0.01" name="amount" required step="0.01" type="number" />
+        </label>
+        <label className="field-label">
+          계좌
+          <select className="field-control bg-white" defaultValue={transaction.account_id} name="accountId" required>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>{account.name}</option>
+            ))}
+          </select>
+        </label>
+        {transaction.type === "transfer" ? (
+          <label className="field-label">
+            받을 계좌
+            <select className="field-control bg-white" defaultValue={transaction.to_account_id ?? ""} name="toAccountId" required>
+              <option value="">받을 계좌 선택</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>{account.name}</option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="field-label">
+            카테고리
+            <select className="field-control bg-white" defaultValue={transaction.category_id ?? ""} name="categoryId" required>
+              <option value="">카테고리 선택</option>
+              {usableCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {categoryOptionLabel(category, categories)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <label className="field-label sm:col-span-2">
+          메모
+          <input className="field-control bg-white" defaultValue={transaction.memo} maxLength={240} name="memo" />
+        </label>
+      </div>
+
+      <button className="button-primary" type="submit">수정 저장</button>
+    </form>
+  );
+}
+
 function CalendarView({
+  accounts,
+  categories,
   endDate,
+  month,
+  periodMode,
+  selectedDate,
   startDate,
   transactions
 }: {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
   endDate: string;
+  month: string;
+  periodMode: boolean;
+  selectedDate?: string;
   startDate: string;
   transactions: TransactionHistoryItem[];
 }) {
   const days = buildCalendarDays(startDate, endDate);
   const grouped = groupByDate(transactions);
+  const selectedItems = selectedDate ? grouped[selectedDate] ?? [] : [];
 
   return (
-    <section className="panel overflow-hidden bg-white">
-      <div className="grid grid-cols-7 border-b border-line bg-white">
-        {weekdayLabels.map((weekday, index) => (
-          <div
-            key={weekday}
-            className={`py-2 text-center text-xs font-bold ${
-              index === 0 ? "text-coral" : index === 6 ? "text-info" : "text-ink/45"
-            }`}
-          >
-            {weekday}
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 bg-white">
-        {days.map((date, index) => {
-          if (!date) {
-            return (
-              <div
-                key={`blank-${index}`}
-                className="min-h-[76px] border-b border-r border-line/50 bg-mist/35 sm:min-h-32"
-              />
-            );
-          }
-
-          const items = grouped[date] ?? [];
-          const income = items
-            .filter((transaction) => transaction.type === "income")
-            .reduce((total, transaction) => total + Number(transaction.amount), 0);
-          const expense = items
-            .filter((transaction) => transaction.type === "expense")
-            .reduce((total, transaction) => total + Number(transaction.amount), 0);
-          const day = Number(date.slice(8, 10));
-
-          return (
-            <div key={date} className="min-w-0 border-b border-r border-line/50 p-1.5 sm:min-h-32 sm:p-3">
-              <div className="flex items-center justify-between gap-1">
-                <p className="text-[11px] font-bold text-ink/55 sm:text-xs">{day}</p>
-                <span className="hidden text-xs text-ink/35 md:inline">{items.length}건</span>
-              </div>
-              <div className="mt-2 min-w-0 space-y-0.5 sm:mt-3 sm:space-y-1">
-                {income > 0 ? (
-                  <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-leaf sm:text-xs">
-                    +{formatCalendarAmount(income)}
-                  </p>
-                ) : null}
-                {expense > 0 ? (
-                  <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-coral sm:text-xs">
-                    -{formatCalendarAmount(expense)}
-                  </p>
-                ) : null}
-              </div>
-              <div className="mt-3 hidden space-y-1 md:block">
-                {items.slice(0, 3).map((transaction) => (
-                  <p key={transaction.id} className={`truncate text-xs font-semibold ${amountTone(transaction.type)}`}>
-                    {transaction.memo || relationName(transaction.categories, transactionTypeLabel(transaction.type))}
-                  </p>
-                ))}
-                {items.length > 3 ? <p className="text-xs text-ink/35">+{items.length - 3}건 더</p> : null}
-              </div>
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <section className="panel overflow-hidden bg-white">
+        <div className="grid grid-cols-7 border-b border-line bg-white">
+          {weekdayLabels.map((weekday, index) => (
+            <div
+              key={weekday}
+              className={`py-2 text-center text-xs font-bold ${
+                index === 0 ? "text-coral" : index === 6 ? "text-info" : "text-ink/45"
+              }`}
+            >
+              {weekday}
             </div>
-          );
-        })}
-      </div>
-    </section>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 bg-white">
+          {days.map((date, index) => {
+            if (!date) {
+              return (
+                <div
+                  key={`blank-${index}`}
+                  className="min-h-[76px] border-b border-r border-line/50 bg-mist/35 sm:min-h-32"
+                />
+              );
+            }
+
+            const items = grouped[date] ?? [];
+            const income = items
+              .filter((transaction) => transaction.type === "income")
+              .reduce((total, transaction) => total + Number(transaction.amount), 0);
+            const expense = items
+              .filter((transaction) => transaction.type === "expense")
+              .reduce((total, transaction) => total + Number(transaction.amount), 0);
+            const day = Number(date.slice(8, 10));
+            const isSelected = selectedDate === date;
+
+            return (
+              <Link
+                aria-label={`${date} 거래 ${items.length}건 보기`}
+                className={`min-w-0 border-b border-r border-line/50 p-1.5 transition hover:bg-paper/70 sm:min-h-32 sm:p-3 ${
+                  isSelected ? "bg-info/10 ring-2 ring-inset ring-info/35" : ""
+                }`}
+                href={detailHref({
+                  day: date,
+                  endDate,
+                  month,
+                  periodMode,
+                  startDate,
+                  view: "calendar"
+                })}
+                key={date}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <p className={`text-[11px] font-bold sm:text-xs ${isSelected ? "text-info" : "text-ink/55"}`}>{day}</p>
+                  <span className="hidden items-center gap-1 text-xs text-ink/35 md:flex">
+                    {items.length}건
+                    <ChevronRight aria-hidden="true" className="h-3 w-3" />
+                  </span>
+                </div>
+                <div className="mt-2 min-w-0 space-y-0.5 sm:mt-3 sm:space-y-1">
+                  {income > 0 ? (
+                    <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-leaf sm:text-xs">
+                      +{formatCalendarAmount(income)}
+                    </p>
+                  ) : null}
+                  {expense > 0 ? (
+                    <p className="truncate text-[9px] font-bold leading-tight tracking-tight text-coral sm:text-xs">
+                      -{formatCalendarAmount(expense)}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="mt-3 hidden space-y-1 md:block">
+                  {items.slice(0, 3).map((transaction) => (
+                    <p key={transaction.id} className={`truncate text-xs font-semibold ${amountTone(transaction.type)}`}>
+                      {transaction.memo || relationName(transaction.categories, transactionTypeLabel(transaction.type))}
+                    </p>
+                  ))}
+                  {items.length > 3 ? <p className="text-xs text-ink/35">+{items.length - 3}건 더</p> : null}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="panel overflow-hidden">
+        <div className="flex items-center justify-between gap-3 bg-paper/70 px-4 py-3">
+          <div>
+            <h2 className="text-sm font-bold text-ink">{selectedDate ?? "날짜 선택"}</h2>
+            <p className="mt-1 text-xs text-ink/45">
+              {selectedDate ? `거래 ${selectedItems.length}건` : "달력에서 날짜를 선택하세요."}
+            </p>
+          </div>
+          {selectedDate ? (
+            <Link className="text-xs font-bold text-info" href={detailHref({ endDate, month, periodMode, startDate, view: "calendar" })}>
+              선택 해제
+            </Link>
+          ) : null}
+        </div>
+        {!selectedDate ? (
+          <p className="p-5 text-sm text-ink/55">날짜를 누르면 해당 날짜의 거래가 목록으로 표시됩니다.</p>
+        ) : selectedItems.length === 0 ? (
+          <p className="p-5 text-sm text-ink/55">선택한 날짜에 거래 내역이 없습니다.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {selectedItems.map((transaction) => (
+              <TransactionDisclosure
+                accounts={accounts}
+                categories={categories}
+                key={transaction.id}
+                transaction={transaction}
+              />
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }
 

@@ -13,6 +13,7 @@ function allowedCategoryTypesForTransaction(type: "income" | "expense" | "adjust
 
 function revalidateTransactionDependents() {
   revalidatePath("/today");
+  revalidatePath("/transactions");
   revalidatePath("/monthly-close");
 }
 

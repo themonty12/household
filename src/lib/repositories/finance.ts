@@ -41,6 +41,8 @@ export type TodayData = {
 export type TransactionHistoryItem = TodayTransaction;
 
 export type TransactionsHistoryData = {
+  accounts: TodayAccount[];
+  categories: TodayCategory[];
   transactions: TransactionHistoryItem[];
 };
 
@@ -337,23 +339,49 @@ export async function getTransactionsHistoryData(
   startDate: string,
   endDate: string
 ): Promise<TransactionsHistoryData> {
-  const transactionsResult = await supabase
-    .from("transactions")
-    .select(
-      "id, date, type, amount, account_id, to_account_id, category_id, memo, created_at, accounts!transactions_account_id_fkey(name), to_account:accounts!transactions_to_account_id_fkey(name), categories!transactions_category_id_fkey(name)"
-    )
-    .eq("household_id", householdId)
-    .eq("status", "posted")
-    .gte("date", startDate)
-    .lte("date", endDate)
-    .order("date", { ascending: false })
-    .order("created_at", { ascending: false });
+  const [accountsResult, categoriesResult, transactionsResult] = await Promise.all([
+    supabase
+      .from("accounts")
+      .select("id, name, type, current_balance")
+      .eq("household_id", householdId)
+      .eq("status", "active")
+      .order("name", { ascending: true }),
+    supabase
+      .from("categories")
+      .select("id, name, type, parent_category_id")
+      .eq("household_id", householdId)
+      .eq("status", "active")
+      .order("parent_category_id", { ascending: true, nullsFirst: true })
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("transactions")
+      .select(
+        "id, date, type, amount, account_id, to_account_id, category_id, memo, created_at, accounts!transactions_account_id_fkey(name), to_account:accounts!transactions_to_account_id_fkey(name), categories!transactions_category_id_fkey(name)"
+      )
+      .eq("household_id", householdId)
+      .eq("status", "posted")
+      .gte("date", startDate)
+      .lte("date", endDate)
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false })
+  ]);
+
+  if (accountsResult.error) {
+    throw accountsResult.error;
+  }
+
+  if (categoriesResult.error) {
+    throw categoriesResult.error;
+  }
 
   if (transactionsResult.error) {
     throw transactionsResult.error;
   }
 
   return {
+    accounts: (accountsResult.data ?? []) as TodayAccount[],
+    categories: (categoriesResult.data ?? []) as TodayCategory[],
     transactions: (transactionsResult.data ?? []) as TransactionHistoryItem[]
   };
 }
