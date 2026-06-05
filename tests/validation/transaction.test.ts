@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { transactionSchema } from "../../src/lib/validation/transaction";
+import { transactionSchema, transactionUpdateSchema } from "../../src/lib/validation/transaction";
 
 describe("transactionSchema", () => {
   it("accepts positive expense and coerces amount to number", () => {
@@ -93,5 +93,19 @@ describe("transactionSchema", () => {
 
     expect(result.success).toBe(false);
     expect(result.error?.issues.some((issue) => issue.path.includes("categoryId"))).toBe(true);
+  });
+
+  it("accepts updates when a transaction id is provided", () => {
+    const transaction = transactionUpdateSchema.parse({
+      id: "transaction-1",
+      date: "2026-05-29",
+      type: "expense",
+      amount: "12500",
+      accountId: "checking",
+      categoryId: "groceries"
+    });
+
+    expect(transaction.id).toBe("transaction-1");
+    expect(transaction.amount).toBe(12500);
   });
 });

@@ -38,6 +38,12 @@ export type TodayData = {
   transactions: TodayTransaction[];
 };
 
+export type TransactionHistoryItem = TodayTransaction;
+
+export type TransactionsHistoryData = {
+  transactions: TransactionHistoryItem[];
+};
+
 export type FinanceAccount = {
   id: string;
   name: string;
@@ -322,6 +328,33 @@ export async function getMonthlyCloseData(
     snapshot: (snapshotResult.data ?? null) as MonthlyCloseSnapshot | null,
     previousSnapshot: (previousSnapshotResult.data ?? null) as MonthlyCloseSnapshot | null,
     savedClose: (savedCloseResult.data ?? null) as SavedMonthlyClose | null
+  };
+}
+
+export async function getTransactionsHistoryData(
+  supabase: SupabaseClient,
+  householdId: string,
+  startDate: string,
+  endDate: string
+): Promise<TransactionsHistoryData> {
+  const transactionsResult = await supabase
+    .from("transactions")
+    .select(
+      "id, date, type, amount, account_id, to_account_id, category_id, memo, created_at, accounts!transactions_account_id_fkey(name), to_account:accounts!transactions_to_account_id_fkey(name), categories!transactions_category_id_fkey(name)"
+    )
+    .eq("household_id", householdId)
+    .eq("status", "posted")
+    .gte("date", startDate)
+    .lte("date", endDate)
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (transactionsResult.error) {
+    throw transactionsResult.error;
+  }
+
+  return {
+    transactions: (transactionsResult.data ?? []) as TransactionHistoryItem[]
   };
 }
 

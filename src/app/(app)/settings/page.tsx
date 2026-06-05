@@ -1,5 +1,6 @@
-import { saveAccount, saveBudget, saveCategory } from "@/app/actions/settings";
-import { ChevronDown, PiggyBank, Plus, Tags, Users, WalletCards } from "lucide-react";
+import Link from "next/link";
+import { saveAccount, saveBudget } from "@/app/actions/settings";
+import { ArrowRight, ChevronDown, PiggyBank, Plus, Tags, Users, WalletCards } from "lucide-react";
 import { requireAdmin } from "@/lib/auth/require-user";
 import {
   accountTypeLabel,
@@ -26,7 +27,6 @@ const accountTypes = [
   "other_liability"
 ] as const;
 
-const categoryTypes = ["expense", "income", "transfer"] as const;
 const recordStatuses = ["active", "archived"] as const;
 
 function currentMonthStart() {
@@ -56,15 +56,15 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
     month
   );
   const expenseCategories = categories.filter(
-    (category) => category.type === "expense" && category.status === "active"
+    (category) =>
+      category.type === "expense" &&
+      category.status === "active" &&
+      category.parent_category_id === null
   );
   const budgetByCategory = new Map(
     budgets.map((budget) => [budget.category_id, Number(budget.amount)])
   );
-  const categoryNameById = new Map(categories.map((category) => [category.id, category.name]));
-  const rootCategories = categories.filter(
-    (category) => category.parent_category_id === null && category.status === "active"
-  );
+  const allRootCategories = categories.filter((category) => category.parent_category_id === null);
 
   return (
     <div className="space-y-8">
@@ -93,7 +93,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         </form>
       </div>
 
-      <section className="grid gap-3 lg:grid-cols-[18rem_1fr]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+      <section className="order-4 grid gap-3 lg:col-start-2 lg:row-start-2">
         <div className="panel p-4">
           <div className="flex items-center gap-2">
             <Users aria-hidden="true" className="h-4 w-4 text-leaf" />
@@ -133,7 +134,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="order-2 space-y-3 lg:col-start-2 lg:row-start-1">
         <div className="flex items-center gap-2">
           <WalletCards aria-hidden="true" className="h-5 w-5 text-leaf" />
           <h2 className="text-lg font-bold text-ink">계좌 관리</h2>
@@ -146,25 +147,58 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         </div>
       </section>
 
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Tags aria-hidden="true" className="h-5 w-5 text-leaf" />
-          <h2 className="text-lg font-bold text-ink">카테고리 관리</h2>
+      <section className="order-1 space-y-3 lg:col-start-1 lg:row-start-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Tags aria-hidden="true" className="h-5 w-5 text-leaf" />
+            <h2 className="text-lg font-bold text-ink">카테고리</h2>
+          </div>
+          <Link href="/settings/categories" className="button-add">
+            상세 관리
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Link>
         </div>
-        <div className="grid gap-3">
-          <CategoryForm title="새 카테고리 추가" rootCategories={rootCategories} isNew />
-          {categories.map((category) => (
-            <CategoryForm
-              key={category.id}
-              title={category.name}
-              category={category}
-              rootCategories={rootCategories.filter((root) => root.id !== category.id)}
-            />
-          ))}
+        <div className="panel overflow-hidden">
+          {allRootCategories.length === 0 ? (
+            <p className="p-5 text-sm text-ink/55">저장된 카테고리가 없습니다.</p>
+          ) : (
+            <ul className="divide-y divide-line">
+              {allRootCategories.map((root) => {
+                const children = categories.filter(
+                  (category) => category.parent_category_id === root.id
+                );
+
+                return (
+                  <li key={root.id} className="px-4 py-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-ink">{root.name}</p>
+                        <p className="mt-1 text-xs text-ink/40">
+                          {categoryTypeLabel(root.type)} · {recordStatusLabel(root.status)}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs font-semibold text-ink/40">
+                        소분류 {children.length}개
+                      </span>
+                    </div>
+                    {children.length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {children.map((category) => (
+                          <span key={category.id} className="rounded-md bg-paper px-2 py-1 text-xs font-semibold text-ink/50">
+                            {category.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section className="order-3 space-y-3 lg:col-start-1 lg:row-start-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <PiggyBank aria-hidden="true" className="h-5 w-5 text-leaf" />
@@ -187,7 +221,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 <input name="month" type="hidden" value={month} />
                 <input name="categoryId" type="hidden" value={category.id} />
                 <label className="field-label">
-                  {categoryDisplayName(category, categoryNameById)}
+                  {category.name}
                   <input
                     className="field-control"
                     defaultValue={budgetByCategory.get(category.id) ?? 0}
@@ -208,6 +242,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
@@ -244,7 +279,7 @@ function AccountForm({ title, account, isNew = false }: AccountFormProps) {
       </summary>
       <form
         action={saveAccount}
-        className="grid gap-3 border-t border-line bg-paper/45 p-4 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto]"
+        className="grid gap-3 border-t border-line bg-paper/45 p-4 sm:grid-cols-2"
       >
         {account ? <input name="id" type="hidden" value={account.id} /> : null}
         <label className="field-label">
@@ -308,133 +343,7 @@ function AccountForm({ title, account, isNew = false }: AccountFormProps) {
         </label>
       </div>
       <button
-        className="button-primary self-end"
-        type="submit"
-      >
-        저장
-      </button>
-      </form>
-    </details>
-  );
-}
-
-type CategoryFormProps = {
-  title: string;
-  isNew?: boolean;
-  category?: {
-    id: string;
-    name: string;
-    type: "income" | "expense" | "transfer";
-    parent_category_id: string | null;
-    sort_order: number;
-    status: "active" | "archived";
-  };
-  rootCategories: Array<{
-    id: string;
-    name: string;
-    type: "income" | "expense" | "transfer";
-  }>;
-};
-
-function categoryDisplayName(
-  category: { name: string; parent_category_id: string | null },
-  categoryNameById: Map<string, string>
-) {
-  const parentName = category.parent_category_id
-    ? categoryNameById.get(category.parent_category_id)
-    : undefined;
-
-  return parentName ? `${parentName} > ${category.name}` : category.name;
-}
-
-function CategoryForm({ title, category, rootCategories, isNew = false }: CategoryFormProps) {
-  return (
-    <details className="panel group overflow-hidden" open={isNew || undefined}>
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${isNew ? "bg-leaf text-white" : "bg-paper text-ink/55"}`}>
-            {isNew ? <Plus aria-hidden="true" className="h-4 w-4" /> : <Tags aria-hidden="true" className="h-4 w-4" />}
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-bold text-ink">{title}</span>
-            <span className="mt-0.5 block text-xs text-ink/45">
-              {category ? `${categoryTypeLabel(category.type)} · ${recordStatusLabel(category.status)}` : "대분류 또는 소분류를 추가하세요."}
-            </span>
-          </span>
-        </div>
-        <ChevronDown aria-hidden="true" className="h-4 w-4 shrink-0 text-ink/40 transition group-open:rotate-180" />
-      </summary>
-      <form
-        action={saveCategory}
-        className="grid gap-3 border-t border-line bg-paper/45 p-4 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr_auto]"
-      >
-        {category ? <input name="id" type="hidden" value={category.id} /> : null}
-        <label className="field-label">
-        카테고리명
-        <input
-          className="field-control bg-white"
-          defaultValue={category?.name}
-          maxLength={80}
-          name="name"
-          placeholder={title}
-          required
-        />
-      </label>
-      <label className="field-label">
-        유형
-        <select
-          className="field-control bg-white"
-          defaultValue={category?.type ?? "expense"}
-          name="type"
-        >
-          {categoryTypes.map((type) => (
-            <option key={type} value={type}>
-              {categoryTypeLabel(type)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="field-label">
-        상위 카테고리
-        <select
-          className="field-control bg-white"
-          defaultValue={category?.parent_category_id ?? ""}
-          name="parentCategoryId"
-        >
-          <option value="">대분류</option>
-          {rootCategories.map((root) => (
-            <option key={root.id} value={root.id}>
-              {categoryTypeLabel(root.type)} · {root.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="field-label">
-        정렬
-        <input
-          className="field-control bg-white"
-          defaultValue={category?.sort_order ?? 0}
-          min="0"
-          name="sortOrder"
-          type="number"
-        />
-      </label>
-      <label className="field-label">
-        상태
-        <select
-          className="field-control bg-white"
-          defaultValue={category?.status ?? "active"}
-          name="status"
-        >
-          {recordStatuses.map((status) => (
-            <option key={status} value={status}>
-              {recordStatusLabel(status)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <button
-        className="button-primary self-end"
+        className="button-primary self-end sm:col-span-2"
         type="submit"
       >
         저장

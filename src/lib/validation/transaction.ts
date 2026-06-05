@@ -7,22 +7,25 @@ const optionalId = z
   .optional()
   .transform((value) => (value ? value : undefined));
 
-export const transactionSchema = z
-  .object({
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜는 YYYY-MM-DD 형식이어야 합니다."),
-    type: z.enum(["income", "expense", "transfer", "adjustment"]),
-    amount: z.coerce.number().positive(),
-    accountId: requiredId,
-    toAccountId: optionalId,
-    categoryId: optionalId,
-    memo: z
-      .string()
-      .trim()
-      .max(240)
-      .optional()
-      .default("")
-  })
-  .superRefine((transaction, context) => {
+const transactionBaseSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "날짜는 YYYY-MM-DD 형식이어야 합니다."),
+  type: z.enum(["income", "expense", "transfer", "adjustment"]),
+  amount: z.coerce.number().positive(),
+  accountId: requiredId,
+  toAccountId: optionalId,
+  categoryId: optionalId,
+  memo: z
+    .string()
+    .trim()
+    .max(240)
+    .optional()
+    .default("")
+});
+
+function validateTransactionRules(
+  transaction: z.infer<typeof transactionBaseSchema>,
+  context: z.RefinementCtx
+) {
     if (transaction.type === "transfer") {
       if (!transaction.toAccountId) {
         context.addIssue({
@@ -66,6 +69,16 @@ export const transactionSchema = z
         path: ["toAccountId"]
       });
     }
-  });
+}
+
+export const transactionSchema = transactionBaseSchema.superRefine(validateTransactionRules);
 
 export type TransactionFormValues = z.infer<typeof transactionSchema>;
+
+export const transactionUpdateSchema = transactionBaseSchema
+  .extend({
+    id: requiredId
+  })
+  .superRefine(validateTransactionRules);
+
+export type TransactionUpdateFormValues = z.infer<typeof transactionUpdateSchema>;

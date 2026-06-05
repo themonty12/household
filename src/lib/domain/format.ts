@@ -15,3 +15,8 @@ export function formatPercent(value: number | null): string {
 
   return `${Math.round(value * 100)}%`;
 }
+
+export function formatIntegerInput(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

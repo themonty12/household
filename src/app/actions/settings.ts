@@ -11,6 +11,7 @@ import {
 
 function revalidateSettingsDependents() {
   revalidatePath("/settings");
+  revalidatePath("/settings/categories");
   revalidatePath("/today");
   revalidatePath("/assets");
   revalidatePath("/monthly-close");
@@ -101,6 +102,24 @@ export async function saveCategory(formData: FormData) {
 export async function saveBudget(formData: FormData) {
   const { user, profile, supabase } = await requireAdmin();
   const budget = budgetSettingsSchema.parse(Object.fromEntries(formData));
+  const { data: category, error: categoryError } = await supabase
+    .from("categories")
+    .select("id, type, parent_category_id")
+    .eq("household_id", profile.household_id)
+    .eq("id", budget.categoryId)
+    .maybeSingle();
+
+  if (categoryError) {
+    throw categoryError;
+  }
+
+  if (
+    !category ||
+    (category as { type: string; parent_category_id: string | null }).type !== "expense" ||
+    (category as { type: string; parent_category_id: string | null }).parent_category_id !== null
+  ) {
+    throw new Error("월 예산은 지출 대분류에만 설정할 수 있습니다.");
+  }
 
   const { error } = await supabase.from("budgets").upsert(
     {
