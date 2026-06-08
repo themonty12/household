@@ -43,6 +43,29 @@ export type MonthlyCloseMetrics = {
   netWorthChange: number | null;
   categoryTotals: Record<string, number>;
   budgetByCategory: Record<string, number>;
+  categoryBreakdown: MonthlyCloseCategoryBreakdown[];
+  accountBreakdown: MonthlyCloseAccountBreakdown[];
   missingBudget: boolean;
   missingSnapshot: boolean;
+};
+
+export type MonthlyCloseCategoryBreakdown = {
+  categoryId: string;
+  type: "income" | "expense";
+  income: number;
+  expense: number;
+  total: number;
+  budget: number;
+  variance: number;
+  count: number;
+};
+
+export type MonthlyCloseAccountBreakdown = {
+  accountId: string;
+  income: number;
+  expense: number;
+  transferIn: number;
+  transferOut: number;
+  netChange: number;
+  count: number;
 };

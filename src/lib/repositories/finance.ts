@@ -69,6 +69,14 @@ export type MonthlyCloseBudget = {
   amount: number | string;
 };
 
+export type MonthlyCloseCategory = {
+  id: string;
+  name: string;
+  type: "income" | "expense" | "transfer";
+  parent_category_id: string | null;
+  status: "active" | "archived";
+};
+
 export type MonthlyCloseSnapshot = {
   month: string;
   total_assets: number | string;
@@ -95,6 +103,7 @@ export type AssetsData = {
 
 export type MonthlyCloseData = {
   accounts: FinanceAccount[];
+  categories: MonthlyCloseCategory[];
   transactions: MonthlyCloseTransaction[];
   budgets: MonthlyCloseBudget[];
   snapshot: MonthlyCloseSnapshot | null;
@@ -250,6 +259,7 @@ export async function getMonthlyCloseData(
 
   const [
     accountsResult,
+    categoriesResult,
     transactionsResult,
     budgetsResult,
     snapshotResult,
@@ -261,6 +271,13 @@ export async function getMonthlyCloseData(
       .select("id, name, type, include_in_net_worth, current_balance")
       .eq("household_id", householdId)
       .eq("status", "active")
+      .order("name", { ascending: true }),
+    supabase
+      .from("categories")
+      .select("id, name, type, parent_category_id, status")
+      .eq("household_id", householdId)
+      .order("parent_category_id", { ascending: true, nullsFirst: true })
+      .order("sort_order", { ascending: true })
       .order("name", { ascending: true }),
     supabase
       .from("transactions")
@@ -303,6 +320,10 @@ export async function getMonthlyCloseData(
     throw accountsResult.error;
   }
 
+  if (categoriesResult.error) {
+    throw categoriesResult.error;
+  }
+
   if (transactionsResult.error) {
     throw transactionsResult.error;
   }
@@ -325,6 +346,7 @@ export async function getMonthlyCloseData(
 
   return {
     accounts: (accountsResult.data ?? []) as FinanceAccount[],
+    categories: (categoriesResult.data ?? []) as MonthlyCloseCategory[],
     transactions: (transactionsResult.data ?? []) as MonthlyCloseTransaction[],
     budgets: (budgetsResult.data ?? []) as MonthlyCloseBudget[],
     snapshot: (snapshotResult.data ?? null) as MonthlyCloseSnapshot | null,

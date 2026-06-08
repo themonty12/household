@@ -1,5 +1,7 @@
 import type {
   BudgetInput,
+  MonthlyCloseAccountBreakdown,
+  MonthlyCloseCategoryBreakdown,
   MonthlyCloseMetrics,
   SnapshotInput,
   TransactionInput
@@ -18,6 +20,8 @@ export function calculateMonthlyClose(
   input: CalculateMonthlyCloseInput
 ): MonthlyCloseMetrics {
   const categoryTotals: Record<string, number> = {};
+  const categoryBreakdownById: Record<string, MonthlyCloseCategoryBreakdown> = {};
+  const accountBreakdownById: Record<string, MonthlyCloseAccountBreakdown> = {};
   const budgetByCategory = input.budgets.reduce<Record<string, number>>(
     (budgets, budget) => {
       budgets[budget.categoryId] = budget.amount;
@@ -33,16 +37,55 @@ export function calculateMonthlyClose(
   for (const transaction of input.transactions) {
     if (transaction.type === "income") {
       incomeTotal += transaction.amount;
+      const category = ensureCategoryBreakdown(
+        categoryBreakdownById,
+        transaction.categoryId,
+        "income",
+        budgetByCategory[transaction.categoryId] ?? 0
+      );
+      category.income += transaction.amount;
+      category.total += transaction.amount;
+      category.count += 1;
+
+      const account = ensureAccountBreakdown(accountBreakdownById, transaction.accountId);
+      account.income += transaction.amount;
+      account.netChange += transaction.amount;
+      account.count += 1;
     }
 
     if (transaction.type === "expense") {
       expenseTotal += transaction.amount;
       categoryTotals[transaction.categoryId] =
         (categoryTotals[transaction.categoryId] ?? 0) + transaction.amount;
+      const category = ensureCategoryBreakdown(
+        categoryBreakdownById,
+        transaction.categoryId,
+        "expense",
+        budgetByCategory[transaction.categoryId] ?? 0
+      );
+      category.expense += transaction.amount;
+      category.total += transaction.amount;
+      category.count += 1;
+
+      const account = ensureAccountBreakdown(accountBreakdownById, transaction.accountId);
+      account.expense += transaction.amount;
+      account.netChange -= transaction.amount;
+      account.count += 1;
     }
 
     if (transaction.type === "transfer") {
       transferTotal += transaction.amount;
+      const sourceAccount = ensureAccountBreakdown(accountBreakdownById, transaction.accountId);
+      sourceAccount.transferOut += transaction.amount;
+      sourceAccount.netChange -= transaction.amount;
+      sourceAccount.count += 1;
+
+      if (transaction.toAccountId) {
+        const destinationAccount = ensureAccountBreakdown(accountBreakdownById, transaction.toAccountId);
+        destinationAccount.transferIn += transaction.amount;
+        destinationAccount.netChange += transaction.amount;
+        destinationAccount.count += 1;
+      }
     }
   }
 
@@ -64,6 +107,19 @@ export function calculateMonthlyClose(
       ((categoryTotals[categoryId] ?? 0) - (budgetByCategory[categoryId] ?? 0)),
     0
   );
+  const categoryBreakdown = Object.values(categoryBreakdownById)
+    .map((category) => ({
+      ...category,
+      variance: category.total - category.budget
+    }))
+    .sort((left, right) => {
+      if (left.type !== right.type) {
+        return left.type === "expense" ? -1 : 1;
+      }
+
+      return right.total - left.total;
+    });
+  const accountBreakdown = Object.values(accountBreakdownById);
 
   return {
     month: input.month,
@@ -85,9 +141,48 @@ export function calculateMonthlyClose(
         : null,
     categoryTotals,
     budgetByCategory,
+    categoryBreakdown,
+    accountBreakdown,
     missingBudget: input.budgets.length === 0,
     missingSnapshot: !input.snapshot
   };
+}
+
+function ensureCategoryBreakdown(
+  categories: Record<string, MonthlyCloseCategoryBreakdown>,
+  categoryId: string,
+  type: "income" | "expense",
+  budget: number
+) {
+  categories[categoryId] ??= {
+    categoryId,
+    type,
+    income: 0,
+    expense: 0,
+    total: 0,
+    budget,
+    variance: 0,
+    count: 0
+  };
+
+  return categories[categoryId];
+}
+
+function ensureAccountBreakdown(
+  accounts: Record<string, MonthlyCloseAccountBreakdown>,
+  accountId: string
+) {
+  accounts[accountId] ??= {
+    accountId,
+    income: 0,
+    expense: 0,
+    transferIn: 0,
+    transferOut: 0,
+    netChange: 0,
+    count: 0
+  };
+
+  return accounts[accountId];
 }
 
 function roundToFourDecimals(value: number): number {

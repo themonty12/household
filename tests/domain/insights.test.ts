@@ -16,6 +16,8 @@ describe("generateInsights", () => {
       netWorthChange: 1200,
       categoryTotals: { food: 1200, rent: 800 },
       budgetByCategory: { food: 1100, rent: 800 },
+      categoryBreakdown: [],
+      accountBreakdown: [],
       missingBudget: false,
       missingSnapshot: false
     });
@@ -41,6 +43,8 @@ describe("generateInsights", () => {
       netWorthChange: null,
       categoryTotals: {},
       budgetByCategory: {},
+      categoryBreakdown: [],
+      accountBreakdown: [],
       missingBudget: true,
       missingSnapshot: true
     };
@@ -73,6 +77,8 @@ describe("generateInsights", () => {
       netWorthChange: null,
       categoryTotals: { medical: 250 },
       budgetByCategory: {},
+      categoryBreakdown: [],
+      accountBreakdown: [],
       missingBudget: false,
       missingSnapshot: false
     });

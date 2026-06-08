@@ -68,6 +68,58 @@ describe("calculateMonthlyClose", () => {
     expect(metrics.fixedCostRatio).toBe(0.16);
     expect(metrics.netWorthChange).toBe(1200);
     expect(metrics.categoryTotals.food).toBe(1200);
+    expect(metrics.categoryBreakdown).toEqual([
+      {
+        budget: 1100,
+        categoryId: "food",
+        count: 1,
+        expense: 1200,
+        income: 0,
+        total: 1200,
+        type: "expense",
+        variance: 100
+      },
+      {
+        budget: 800,
+        categoryId: "rent",
+        count: 1,
+        expense: 800,
+        income: 0,
+        total: 800,
+        type: "expense",
+        variance: 0
+      },
+      {
+        budget: 0,
+        categoryId: "salary",
+        count: 1,
+        expense: 0,
+        income: 5000,
+        total: 5000,
+        type: "income",
+        variance: 5000
+      }
+    ]);
+    expect(metrics.accountBreakdown).toEqual([
+      {
+        accountId: "checking",
+        count: 4,
+        expense: 2000,
+        income: 5000,
+        netChange: 2000,
+        transferIn: 0,
+        transferOut: 1000
+      },
+      {
+        accountId: "savings",
+        count: 1,
+        expense: 0,
+        income: 0,
+        netChange: 1000,
+        transferIn: 1000,
+        transferOut: 0
+      }
+    ]);
   });
 
   it("subtracts budgeted categories with zero actual spend from budget variance", () => {

@@ -38,6 +38,8 @@ describe("monthly close repositories", () => {
       netWorthChange: 1200,
       categoryTotals: { food: 1200 },
       budgetByCategory: { food: 1000 },
+      categoryBreakdown: [],
+      accountBreakdown: [],
       missingBudget: false,
       missingSnapshot: false
     };
